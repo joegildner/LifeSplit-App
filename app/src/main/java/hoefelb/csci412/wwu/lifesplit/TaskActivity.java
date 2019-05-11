@@ -36,5 +36,14 @@ public class TaskActivity extends AppCompatActivity {
                 //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
             }
         });
+
+        final Button task3Button = findViewById(R.id.task3);
+        task3Button.setBackgroundColor(Color.TRANSPARENT);
+        task3Button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(TaskActivity.this, newTaskActivity.class));
+                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
+            }
+        });
     }
 }
