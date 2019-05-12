@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 public class TaskActivity extends AppCompatActivity {
@@ -47,7 +48,10 @@ public class TaskActivity extends AppCompatActivity {
                 Button newButton = new Button(TaskActivity.this);
                 newButton.setText("new button");
                 ConstraintLayout cl = findViewById(R.id.cl);
-                ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                final Button holder= findViewById(R.id.holder4);
+                ViewGroup.LayoutParams lp = holder.getLayoutParams();
+                //ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                //.setTop(task3Button.getBottom());
                 cl.addView(newButton, lp);
             }
         });
