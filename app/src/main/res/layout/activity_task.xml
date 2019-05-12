@@ -34,8 +34,19 @@
     </android.support.design.widget.AppBarLayout>
 
     <include
+        android:id="@+id/include2"
         layout="@layout/content_task"
         android:layout_height="326dp"
         tools:layout_editor_absoluteY="388dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_anchor="@+id/include2"
+        app:layout_anchorGravity="right|bottom"
+        app:srcCompat="@android:drawable/ic_menu_add" />
 
 </android.support.design.widget.CoordinatorLayout>
