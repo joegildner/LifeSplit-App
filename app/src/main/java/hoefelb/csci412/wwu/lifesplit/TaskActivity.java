@@ -32,6 +32,23 @@ public class TaskActivity extends AppCompatActivity {
         }
         return findViewById(R.id.holder12);
     }
+
+    private String getName() {
+        switch(numButtons) {
+            //case 2: return findViewById(R.id.holder3);
+            case 3: return "Task 4";
+            case 4: return "Task 5";
+            case 5: return "Task 6";
+            case 6: return "Task 7";
+            case 7: return "Task 8";
+            case 8: return "Task 9";
+            case 9: return "Task 10";
+            case 10: return "Task 11";
+            case 11: return "Task 12";
+        }
+        return "what have you done";
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +61,6 @@ public class TaskActivity extends AppCompatActivity {
         task1Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(TaskActivity.this, TimingScreen.class));
-                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -53,7 +69,6 @@ public class TaskActivity extends AppCompatActivity {
         task2Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(TaskActivity.this, TimingScreen.class));
-                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
             }
         });
 
@@ -63,12 +78,17 @@ public class TaskActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(numButtons < 12) {
                     Button newButton = new Button(TaskActivity.this);
-                    newButton.setText("new button");
+                    newButton.setText(getName());
                     ConstraintLayout cl = findViewById(R.id.cl);
                     final Button holder = getHolder();
                     ViewGroup.LayoutParams lp = holder.getLayoutParams();
                     cl.addView(newButton, lp);
                     numButtons++;
+                    newButton.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View view) {
+                            startActivity(new Intent(TaskActivity.this, TimingScreen.class));
+                        }
+                    });
                 }
             }
         });
