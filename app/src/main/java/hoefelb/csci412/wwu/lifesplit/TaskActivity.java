@@ -1,8 +1,10 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -41,8 +43,12 @@ public class TaskActivity extends AppCompatActivity {
         task3Button.setBackgroundColor(Color.TRANSPARENT);
         task3Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(TaskActivity.this, TimingScreen.class));
-                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
+                //startActivity(new Intent(TaskActivity.this, TimingScreen.class));
+                Button newButton = new Button(TaskActivity.this);
+                newButton.setText("new button");
+                ConstraintLayout cl = findViewById(R.id.cl);
+                ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                cl.addView(newButton, lp);
             }
         });
 

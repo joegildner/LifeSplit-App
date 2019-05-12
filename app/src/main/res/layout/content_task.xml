@@ -10,7 +10,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/cl">
 
         <Button
             android:id="@+id/task1"
@@ -40,7 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_orange_dark"
-            android:text="Task3"
+            android:text="AddButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
