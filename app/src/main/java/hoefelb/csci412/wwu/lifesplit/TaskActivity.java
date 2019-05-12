@@ -15,6 +15,23 @@ import android.widget.Button;
 
 public class TaskActivity extends AppCompatActivity {
 
+    private int numButtons = 3;
+
+    private Button getHolder() {
+        switch(numButtons) {
+            //case 2: return findViewById(R.id.holder3);
+            case 3: return findViewById(R.id.holder4);
+            case 4: return findViewById(R.id.holder5);
+            case 5: return findViewById(R.id.holder6);
+            case 6: return findViewById(R.id.holder7);
+            case 7: return findViewById(R.id.holder8);
+            case 8: return findViewById(R.id.holder9);
+            case 9: return findViewById(R.id.holder10);
+            case 10: return findViewById(R.id.holder11);
+            case 11: return findViewById(R.id.holder12);
+        }
+        return findViewById(R.id.holder12);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,15 +61,15 @@ public class TaskActivity extends AppCompatActivity {
         task3Button.setBackgroundColor(Color.TRANSPARENT);
         task3Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //startActivity(new Intent(TaskActivity.this, TimingScreen.class));
-                Button newButton = new Button(TaskActivity.this);
-                newButton.setText("new button");
-                ConstraintLayout cl = findViewById(R.id.cl);
-                final Button holder= findViewById(R.id.holder4);
-                ViewGroup.LayoutParams lp = holder.getLayoutParams();
-                //ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                //.setTop(task3Button.getBottom());
-                cl.addView(newButton, lp);
+                if(numButtons < 12) {
+                    Button newButton = new Button(TaskActivity.this);
+                    newButton.setText("new button");
+                    ConstraintLayout cl = findViewById(R.id.cl);
+                    final Button holder = getHolder();
+                    ViewGroup.LayoutParams lp = holder.getLayoutParams();
+                    cl.addView(newButton, lp);
+                    numButtons++;
+                }
             }
         });
 
