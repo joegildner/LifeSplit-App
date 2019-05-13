@@ -1,12 +1,10 @@
 package hoefelb.csci412.wwu.lifesplit;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -53,14 +51,14 @@ public class TaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.taskName);
         setSupportActionBar(toolbar);
 
         final Button task1Button = findViewById(R.id.task1);
         task1Button.setBackgroundColor(Color.TRANSPARENT);
         task1Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(TaskActivity.this, TimingScreen.class));
+                createActivity(task1Button);
             }
         });
 
@@ -68,7 +66,7 @@ public class TaskActivity extends AppCompatActivity {
         task2Button.setBackgroundColor(Color.TRANSPARENT);
         task2Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(TaskActivity.this, TimingScreen.class));
+                createActivity(task2Button);
             }
         });
 
@@ -77,7 +75,7 @@ public class TaskActivity extends AppCompatActivity {
         task3Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(numButtons < 12) {
-                    Button newButton = new Button(TaskActivity.this);
+                    final Button newButton = new Button(TaskActivity.this);
                     newButton.setText(getName());
                     ConstraintLayout cl = findViewById(R.id.cl);
                     final Button holder = getHolder();
@@ -86,7 +84,7 @@ public class TaskActivity extends AppCompatActivity {
                     numButtons++;
                     newButton.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View view) {
-                            startActivity(new Intent(TaskActivity.this, TimingScreen.class));
+                            createActivity(newButton);
                         }
                     });
                 }
@@ -101,5 +99,13 @@ public class TaskActivity extends AppCompatActivity {
                 //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    public void createActivity(Button context){
+        Intent thisActivity = new Intent(TaskActivity.this, TimingScreen.class);
+
+        thisActivity.putExtra("title", context.getText());
+
+        startActivity(thisActivity);
     }
 }
