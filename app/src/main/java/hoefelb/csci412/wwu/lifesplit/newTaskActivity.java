@@ -42,6 +42,7 @@ public class newTaskActivity extends AppCompatActivity {
         addSplitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Credit: https://stackoverflow.com/questions/43666301/android-dynamically-add-edittext-in-linear-layout
                 EditText newText = new EditText(getApplicationContext());
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
                 newText.setLayoutParams(params);
