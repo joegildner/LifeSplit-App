@@ -81,6 +81,7 @@ public class newTaskActivity extends AppCompatActivity {
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();
                 }
+                SplitObject newSplitObject = new SplitObject(taskTitle,taskDescription,splitTitles);
                 //Save this data to whatever data structure is created
                 newTaskActivity.this.finish();
             }

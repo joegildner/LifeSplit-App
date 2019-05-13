@@ -1,18 +1,20 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.text.Editable;
+
 /**
  * Created by wilso279 on 5/13/19.
  */
 
 public class SplitObject {
-    private String name;
-    private String description;
+    private Editable name;
+    private Editable description;
     private int count;
     private float avg;
-    private String[] splitNames;
+    private Editable[] splitNames;
     private float[] splitTimes;
 
-    public SplitObject(final String name, final String description, final String[] splitNames) {
+    public SplitObject(final Editable name, final Editable description, final Editable[] splitNames) {
         this.name = name;
         this.description = description;
         this.splitNames = splitNames;
@@ -24,15 +26,15 @@ public class SplitObject {
         this.avg = 0;
     }
 
-    public String getName() {
+    public Editable getName() {
         return this.name;
     }
 
-    public String getDescription() {
+    public Editable getDescription() {
         return this.description;
     }
 
-    public String getSplitName(final int index) {
+    public Editable getSplitName(final int index) {
         return this.splitNames[index];
     }
 
