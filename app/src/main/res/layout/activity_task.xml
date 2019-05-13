@@ -21,10 +21,10 @@
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:toolbarId="@+id/taskName">
+            app:toolbarId="@+id/toolbar">
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/taskName"
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="53dp"
                 app:layout_collapseMode="pin"
