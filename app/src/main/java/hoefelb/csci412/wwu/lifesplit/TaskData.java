@@ -1,5 +1,7 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.text.Editable;
+
 import java.util.ArrayList;
 
 /**
@@ -11,11 +13,13 @@ class TaskData {
     private static ArrayList<SplitObject> taskData;
 
     static void init(){
-        taskData = new ArrayList<SplitObject>();
+        taskData = new ArrayList<>();
     }
 
-    static void addTask(SplitObject newTask) {
-        taskData.add(newTask);
+    static void addTask(Editable taskTitle, Editable taskDescription, Editable[] splitTitles) {
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles);
+
+        taskData.add(newSplitObject);
     }
 
     static int getIndex(SplitObject task) {

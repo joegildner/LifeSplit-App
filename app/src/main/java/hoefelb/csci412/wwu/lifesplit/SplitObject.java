@@ -2,13 +2,11 @@ package hoefelb.csci412.wwu.lifesplit;
 
 import android.text.Editable;
 
-import java.io.Serializable;
-
 /**
  * Created by wilso279 on 5/13/19.
  */
 
-public class SplitObject implements Serializable{
+public class SplitObject {
     private Editable name;
     private Editable description;
     private int count;
@@ -24,15 +22,6 @@ public class SplitObject implements Serializable{
         for(int i = 0; i < splitNames.length; i++) {
             this.splitTimes[i] = 0;
         }
-        this.count = 0;
-        this.avg = 0;
-    }
-
-    public SplitObject() {
-        this.name = null;
-        this.description = null;
-        this.splitNames = null;
-        this.splitTimes = null;
         this.count = 0;
         this.avg = 0;
     }
@@ -59,8 +48,8 @@ public class SplitObject implements Serializable{
 
     public float calcAvg() {
         float total = 0;
-        for(int i = 0; i < splitTimes.length; i++) {
-            total += splitTimes[i];
+        for (float splitTime : splitTimes) {
+            total += splitTime;
         }
         this.avg = total/this.count;
         return this.avg;
