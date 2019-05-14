@@ -1,12 +1,11 @@
 package hoefelb.csci412.wwu.lifesplit;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -76,20 +75,7 @@ public class TaskActivity extends AppCompatActivity {
         task3Button.setBackgroundColor(Color.TRANSPARENT);
         task3Button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(numButtons < 12) {
-                    Button newButton = new Button(TaskActivity.this);
-                    newButton.setText(getName());
-                    ConstraintLayout cl = findViewById(R.id.cl);
-                    final Button holder = getHolder();
-                    ViewGroup.LayoutParams lp = holder.getLayoutParams();
-                    cl.addView(newButton, lp);
-                    numButtons++;
-                    newButton.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View view) {
-                            startActivity(new Intent(TaskActivity.this, TimingScreen.class));
-                        }
-                    });
-                }
+                newButtonClick(v);
             }
         });
 
@@ -97,9 +83,31 @@ public class TaskActivity extends AppCompatActivity {
         addButton.setBackgroundColor(Color.TRANSPARENT);
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startActivity(new Intent(TaskActivity.this, newTaskActivity.class));
-                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
+                Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
+                SplitObject newSplitObject = new SplitObject();
+                newTaskIntent.putExtra("data", newSplitObject);
+                startActivity(newTaskIntent);
             }
         });
+    }
+
+    public void newButtonClick(View v){
+        if(numButtons < 12) {
+            Button newButton = new Button(TaskActivity.this);
+            newButton.setText(getName());
+            ConstraintLayout cl = findViewById(R.id.cl);
+            final Button holder = getHolder();
+            ViewGroup.LayoutParams lp = holder.getLayoutParams();
+            cl.addView(newButton, lp);
+            numButtons++;
+            newButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
+                    SplitObject newSplitObject = new SplitObject();
+                    taskIntent.putExtra("data", newSplitObject);
+                    startActivity(taskIntent);
+                }
+            });
+        }
     }
 }
