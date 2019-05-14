@@ -1,5 +1,6 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,7 +18,7 @@ public class TaskActivity extends AppCompatActivity {
     private int numButtons = 3;
 
     private Button getHolder() {
-        switch(numButtons) {
+        switch(numButtons-1) {
             //case 2: return findViewById(R.id.holder3);
             case 3: return findViewById(R.id.holder4);
             case 4: return findViewById(R.id.holder5);
@@ -84,27 +85,46 @@ public class TaskActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
-                SplitObject newSplitObject = new SplitObject();
-                newTaskIntent.putExtra("data", newSplitObject);
-                startActivity(newTaskIntent);
+                //startActivityForResult(newTaskIntent, Activity.RESULT_OK);
+                startActivityForResult(newTaskIntent,0);
+                //newButtonClick(v);
             }
         });
     }
 
-    public void newButtonClick(View v){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(numButtons < 12) {
+            numButtons++;
             Button newButton = new Button(TaskActivity.this);
-            newButton.setText(getName());
+            //newButton.setText(TaskData.getTask(numButtons - 4).getName());
             ConstraintLayout cl = findViewById(R.id.cl);
             final Button holder = getHolder();
             ViewGroup.LayoutParams lp = holder.getLayoutParams();
             cl.addView(newButton, lp);
-            numButtons++;
             newButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                    SplitObject newSplitObject = new SplitObject();
-                    taskIntent.putExtra("data", newSplitObject);
+                    taskIntent.putExtra("index", numButtons - 4);
+                    startActivity(taskIntent);
+                }
+            });
+        }
+    }
+
+    public void newButtonClick(View v){
+        if(numButtons < 12) {
+            numButtons++;
+            Button newButton = new Button(TaskActivity.this);
+            newButton.setText(TaskData.getTask(numButtons - 4).getName());
+            ConstraintLayout cl = findViewById(R.id.cl);
+            final Button holder = getHolder();
+            ViewGroup.LayoutParams lp = holder.getLayoutParams();
+            cl.addView(newButton, lp);
+            newButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
+                    taskIntent.putExtra("index", numButtons - 4);
                     startActivity(taskIntent);
                 }
             });

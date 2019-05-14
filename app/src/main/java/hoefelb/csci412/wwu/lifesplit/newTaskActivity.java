@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ public class newTaskActivity extends AppCompatActivity {
         final Button resetScreenButton = findViewById(R.id.newTaskResetButton);
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
         final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
+        TaskData.init();
 
         EditText newText = new EditText(getApplicationContext());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -81,9 +83,13 @@ public class newTaskActivity extends AppCompatActivity {
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();
                 }
-                SplitObject hey = (SplitObject)getIntent().getSerializableExtra("data");
+
+                Intent returnIntent = getIntent();
+                //String test = "test";
                 SplitObject newSplitObject = new SplitObject(taskTitle,taskDescription,splitTitles);
-                //Save this data to whatever data structure is created
+                TaskData.addTask(newSplitObject);
+                returnIntent.putExtra("data", TaskData.getIndex(newSplitObject));
+                setResult(Activity.RESULT_OK, returnIntent);
                 newTaskActivity.this.finish();
             }
         });
