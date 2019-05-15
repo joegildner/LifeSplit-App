@@ -31,7 +31,9 @@ public class TimingScreen extends AppCompatActivity {
 
     public String[] names = {"Cook food", "Eat", "Put Away Dishes"};
     public ArrayList<String> splitNames = new ArrayList<String>(Arrays.asList(names));
-
+    private boolean isPaused = true;
+    private boolean isStarted = false;
+    private int currentSplitIndex = 0;
     public TextView timer;
     public Button pauseButton;
     public Button splitButton;
@@ -69,15 +71,51 @@ public class TimingScreen extends AppCompatActivity {
 
         splitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startTime = SystemClock.uptimeMillis();
-                handler.postDelayed(runnable, 0);
+                if(isPaused&&!isStarted){
+                    //Start the stopwatch for the first time
+                    isPaused = false;
+                    isStarted = true;
+                    splitButton.setText("Split");
+                    startTime = SystemClock.uptimeMillis();
+                    handler.postDelayed(runnable, 0);
+                }
+                else if(isPaused){
+                    //Resume from last point.
+                    isPaused = false;
+                    splitButton.setText("Split");
+                    pauseButton.setText("Pause");
+                    startTime = SystemClock.uptimeMillis();
+                    handler.postDelayed(runnable, 0);
+                }
+                else{
+                    //Take a split
+                    startTime = SystemClock.uptimeMillis();
+                    handler.postDelayed(runnable, 0);
+                    currentSplitIndex++;
+                    //CHECK FOR LAST SPLIT
+
+                }
             }
         });
 
         pauseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                timeBuff += milSecs;
-                handler.removeCallbacks(runnable);
+                if(isStarted&&!isPaused){
+                    //Pause the timer
+                    splitButton.setText("Resume");
+                    pauseButton.setText("Reset");
+                    timeBuff += milSecs;
+                    handler.removeCallbacks(runnable);
+                    isPaused = true;
+                }
+                else if(isPaused){
+                    //Reset all the timers.
+                    splitButton.setText("Start");
+                    pauseButton.setText("Pause");
+                    isPaused= true;
+                    isStarted = false;
+                    currentSplitIndex = 0;
+                }
             }
         });
 
