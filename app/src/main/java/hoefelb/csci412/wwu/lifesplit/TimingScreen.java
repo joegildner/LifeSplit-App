@@ -72,6 +72,7 @@ public class TimingScreen extends AppCompatActivity {
         splitButton = (Button) findViewById(R.id.split_button);
 
         handler = new Handler();
+        timer.setText("--:--:--");
 
         splitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -137,6 +138,7 @@ public class TimingScreen extends AppCompatActivity {
                         TextView splitTextView = (TextView) currentSplit.getChildAt(1);
                         splitTextView.setText("--:--:--");
                     }
+                    timer.setText("--:--:--");
                     currentSplitIndex = 0;
                 }
             }
