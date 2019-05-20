@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Layout;
@@ -60,13 +61,15 @@ public class TimingScreen extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final RecyclerView splitItems = (RecyclerView) findViewById(R.id.split_views);
-        SplitAdapter sAdapter = new SplitAdapter(splitNames);
+        final SplitAdapter sAdapter = new SplitAdapter(splitNames);
         splitItems.setAdapter(sAdapter);
-        splitItems.setLayoutManager(new LinearLayoutManager(this));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        splitItems.setLayoutManager(linearLayoutManager);
 
         timer = (TextView)findViewById(R.id.timerText);
         pauseButton = (Button) findViewById(R.id.pause_button);
         splitButton = (Button) findViewById(R.id.split_button);
+
         handler = new Handler();
 
         splitButton.setOnClickListener(new View.OnClickListener() {
@@ -90,8 +93,16 @@ public class TimingScreen extends AppCompatActivity {
                 else{
                     //Take a split
                     startTime = SystemClock.uptimeMillis();
+                    LinearLayout current =  (LinearLayout)splitItems.getChildAt(currentSplitIndex);
+                    TextView splitTextView = (TextView)current.getChildAt(1);
+                    splitTextView.setText(toTimeFormat());
                     handler.postDelayed(runnable, 0);
                     currentSplitIndex++;
+
+                    if (currentSplitIndex == splitItems.getChildCount()){
+                        //Save all the split data, get ready for handing back to parent activity
+                        //Perhaps keep the bottom timing view as total time, then pull value from that?
+                    }
                     //CHECK FOR LAST SPLIT
 
                 }
@@ -114,11 +125,29 @@ public class TimingScreen extends AppCompatActivity {
                     pauseButton.setText("Pause");
                     isPaused= true;
                     isStarted = false;
+                    for(int i = 0; i < currentSplitIndex; i++){
+                        LinearLayout currentSplit = (LinearLayout) splitItems.getChildAt(i);
+                        TextView splitTextView = (TextView) currentSplit.getChildAt(1);
+                        splitTextView.setText("--:--:--");
+                    }
                     currentSplitIndex = 0;
                 }
             }
         });
 
+    }
+
+    String toTimeFormat(){
+        milSecs = SystemClock.uptimeMillis() - startTime;
+        upTime = timeBuff + milSecs;
+
+        hours = TimeUnit.MILLISECONDS.toHours(upTime);
+        mins = TimeUnit.MILLISECONDS.toMinutes(upTime)-hours*60;
+        secs = TimeUnit.MILLISECONDS.toSeconds(upTime)-3600*hours-60*mins;
+
+        String timerText = String.format("%02d:%02d:%02d", hours, mins,secs);
+
+        return timerText;
     }
 
     public class SplitAdapter extends RecyclerView.Adapter<SplitAdapter.ViewHolder> {
