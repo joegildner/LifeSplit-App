@@ -34,6 +34,7 @@ public class TimingScreen extends AppCompatActivity {
     public ArrayList<String> splitNames = new ArrayList<String>(Arrays.asList(names));
     private boolean isPaused = true;
     private boolean isStarted = false;
+    private boolean isCompleted = false;
     private int currentSplitIndex = 0;
     public TextView timer;
     public Button pauseButton;
@@ -74,6 +75,8 @@ public class TimingScreen extends AppCompatActivity {
 
         splitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(isCompleted)
+                    return;
                 if(isPaused&&!isStarted){
                     //Start the stopwatch for the first time
                     isPaused = false;
@@ -87,16 +90,19 @@ public class TimingScreen extends AppCompatActivity {
                     isPaused = false;
                     splitButton.setText("Split");
                     pauseButton.setText("Pause");
-                    startTime = SystemClock.uptimeMillis();
+                    startTime = SystemClock.uptimeMillis()-timeBuff;
+                    timeBuff=0;
                     handler.postDelayed(runnable, 0);
                 }
                 else{
                     //Take a split
-                    startTime = SystemClock.uptimeMillis();
+                    //reset timeBuff so pausing previous split will not affect future split
                     LinearLayout current =  (LinearLayout)splitItems.getChildAt(currentSplitIndex);
                     TextView splitTextView = (TextView)current.getChildAt(1);
                     splitTextView.setText(toTimeFormat());
                     handler.postDelayed(runnable, 0);
+                    startTime = SystemClock.uptimeMillis();
+                    timeBuff=0;
                     currentSplitIndex++;
 
                     if (currentSplitIndex == splitItems.getChildCount()){
@@ -125,6 +131,7 @@ public class TimingScreen extends AppCompatActivity {
                     pauseButton.setText("Pause");
                     isPaused= true;
                     isStarted = false;
+                    timeBuff = 0;
                     for(int i = 0; i < currentSplitIndex; i++){
                         LinearLayout currentSplit = (LinearLayout) splitItems.getChildAt(i);
                         TextView splitTextView = (TextView) currentSplit.getChildAt(1);
@@ -139,6 +146,8 @@ public class TimingScreen extends AppCompatActivity {
 
     String toTimeFormat(){
         milSecs = SystemClock.uptimeMillis() - startTime;
+        System.out.println(SystemClock.uptimeMillis());
+        System.out.println(milSecs);
         upTime = timeBuff + milSecs;
 
         hours = TimeUnit.MILLISECONDS.toHours(upTime);
