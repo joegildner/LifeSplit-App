@@ -39,6 +39,7 @@ public class TimingScreen extends AppCompatActivity {
     public TextView timer;
     public Button pauseButton;
     public Button splitButton;
+    private long totalTime=0;
     long milSecs;
     long startTime;
     long timeBuff;
@@ -107,6 +108,9 @@ public class TimingScreen extends AppCompatActivity {
                     currentSplitIndex++;
 
                     if (currentSplitIndex == splitItems.getChildCount()){
+                        handler.removeCallbacks(runnable);
+                        System.out.println(totalTime);
+                        timer.setText(toTimeFormat(totalTime));
                         //Save all the split data, get ready for handing back to parent activity
                         //Perhaps keep the bottom timing view as total time, then pull value from that?
                     }
@@ -146,15 +150,31 @@ public class TimingScreen extends AppCompatActivity {
 
     }
 
+
+    //to get current split's time, formatted as --:--:--
     String toTimeFormat(){
         milSecs = SystemClock.uptimeMillis() - startTime;
-        System.out.println(SystemClock.uptimeMillis());
-        System.out.println(milSecs);
-        upTime = timeBuff + milSecs;
+        //System.out.println(SystemClock.uptimeMillis());
+        //System.out.println(milSecs);
+        totalTime+= milSecs;
 
+        upTime = timeBuff + milSecs;
         hours = TimeUnit.MILLISECONDS.toHours(upTime);
         mins = TimeUnit.MILLISECONDS.toMinutes(upTime)-hours*60;
         secs = TimeUnit.MILLISECONDS.toSeconds(upTime)-3600*hours-60*mins;
+
+        String timerText = String.format("%02d:%02d:%02d", hours, mins,secs);
+
+        return timerText;
+    }
+
+
+    //Overloaded method for when miliseconds is known, to format as --:--:--
+    String toTimeFormat(long time){
+        upTime = timeBuff + milSecs;
+        hours = TimeUnit.MILLISECONDS.toHours(time);
+        mins = TimeUnit.MILLISECONDS.toMinutes(time)-hours*60;
+        secs = TimeUnit.MILLISECONDS.toSeconds(time)-3600*hours-60*mins;
 
         String timerText = String.format("%02d:%02d:%02d", hours, mins,secs);
 
