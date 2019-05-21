@@ -83,8 +83,11 @@ public class newTaskActivity extends AppCompatActivity {
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();
                 }
-                TaskData.addTask(taskTitle,taskDescription,splitTitles);
+                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
+                //System.out.println(newSplitObject.getName());
                 Intent returnIntent = getIntent();
+                Bundle returnBundle = new Bundle();
+                returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
                 newTaskActivity.this.finish();
             }

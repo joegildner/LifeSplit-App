@@ -7,6 +7,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -74,7 +75,13 @@ public class TaskActivity extends AppCompatActivity {
         if(numButtons < 12) {
             Button newButton = new Button(TaskActivity.this);
             //newButton.setText(TaskData.getTask(numButtons).getName());
-            newButton.setText(getName());
+            int extras = data.getIntExtra("splitObjectIndex", -1);
+            if (extras != -1) {
+                System.out.println(extras);
+                System.out.println(TaskData.getTask(extras).getName());
+            }
+            final SplitObject newSplitObject = TaskData.getTask(extras);
+            newButton.setText(newSplitObject.getName());
             ConstraintLayout cl = findViewById(R.id.cl);
             final Button holder = getHolder();
             ViewGroup.LayoutParams lp = holder.getLayoutParams();
@@ -82,11 +89,12 @@ public class TaskActivity extends AppCompatActivity {
             newButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                    taskIntent.putExtra("index", numButtons);
+                    taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
                     startActivity(taskIntent);
                 }
             });
             numButtons++;
         }
+        }
     }
-}
+

@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,7 +54,12 @@ public class TimingScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Intent context = getIntent();
-        String title = context.getStringExtra("title");
+        int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        if (splitObjectIndex == -1){
+            System.out.println("ERROR - ID not found");
+        }
+        SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        Editable title = splitObject.getName();
         System.out.println(title);
 
         super.onCreate(savedInstanceState);
@@ -108,6 +114,7 @@ public class TimingScreen extends AppCompatActivity {
                     currentSplitIndex++;
 
                     if (currentSplitIndex == splitItems.getChildCount()){
+                        isCompleted = true;
                         handler.removeCallbacks(runnable);
                         System.out.println(totalTime);
                         timer.setText(toTimeFormat(totalTime));
@@ -122,6 +129,8 @@ public class TimingScreen extends AppCompatActivity {
 
         pauseButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(isCompleted)
+                    return;
                 if(isStarted&&!isPaused){
                     //Pause the timer
                     splitButton.setText("Resume");
@@ -137,6 +146,7 @@ public class TimingScreen extends AppCompatActivity {
                     isPaused= true;
                     isStarted = false;
                     timeBuff = 0;
+                    totalTime = 0;
                     for(int i = 0; i < currentSplitIndex; i++){
                         LinearLayout currentSplit = (LinearLayout) splitItems.getChildAt(i);
                         TextView splitTextView = (TextView) currentSplit.getChildAt(1);

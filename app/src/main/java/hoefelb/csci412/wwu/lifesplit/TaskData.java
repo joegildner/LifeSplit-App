@@ -16,10 +16,11 @@ class TaskData {
         taskData = new ArrayList<>();
     }
 
-    static void addTask(Editable taskTitle, Editable taskDescription, Editable[] splitTitles) {
+    static SplitObject addTask(Editable taskTitle, Editable taskDescription, Editable[] splitTitles) {
         SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles);
 
         taskData.add(newSplitObject);
+        return newSplitObject;
     }
 
     static int getIndex(SplitObject task) {
