@@ -1,5 +1,6 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -57,7 +58,7 @@ public class TimingScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Intent context = getIntent();
-        int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        final int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
@@ -125,6 +126,11 @@ public class TimingScreen extends AppCompatActivity {
                         timer.setText(toTimeFormat(totalTime));
                         //Save all the split data, get ready for handing back to parent activity
                         //Perhaps keep the bottom timing view as total time, then pull value from that?
+                        Intent returnIntent = getIntent();
+                        returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                        returnIntent.putExtra("totalTimeLong",totalTime);
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        TimingScreen.this.finish();
                     }
                     //CHECK FOR LAST SPLIT
 

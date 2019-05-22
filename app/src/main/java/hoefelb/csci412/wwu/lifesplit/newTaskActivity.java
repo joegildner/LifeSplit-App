@@ -86,7 +86,6 @@ public class newTaskActivity extends AppCompatActivity {
                 SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
                 //System.out.println(newSplitObject.getName());
                 Intent returnIntent = getIntent();
-                Bundle returnBundle = new Bundle();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
                 newTaskActivity.this.finish();

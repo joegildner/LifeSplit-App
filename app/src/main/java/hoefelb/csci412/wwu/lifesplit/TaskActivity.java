@@ -1,5 +1,6 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -72,29 +73,42 @@ public class TaskActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(numButtons < 12) {
-            Button newButton = new Button(TaskActivity.this);
-            //newButton.setText(TaskData.getTask(numButtons).getName());
-            int extras = data.getIntExtra("splitObjectIndex", -1);
-            if (extras != -1) {
-                System.out.println(extras);
-                System.out.println(TaskData.getTask(extras).getName());
-            }
-            final SplitObject newSplitObject = TaskData.getTask(extras);
-            newButton.setText(newSplitObject.getName());
-            ConstraintLayout cl = findViewById(R.id.cl);
-            final Button holder = getHolder();
-            ViewGroup.LayoutParams lp = holder.getLayoutParams();
-            cl.addView(newButton, lp);
-            newButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View view) {
-                    Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                    taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
-                    startActivity(taskIntent);
+        if (requestCode ==0 && resultCode == Activity.RESULT_OK){
+            if(numButtons < 12) {
+                Button newButton = new Button(TaskActivity.this);
+                //newButton.setText(TaskData.getTask(numButtons).getName());
+                int extras = data.getIntExtra("splitObjectIndex", -1);
+                if (extras != -1) {
+                    System.out.println(extras);
+                    System.out.println(TaskData.getTask(extras).getName());
                 }
-            });
-            numButtons++;
+                final SplitObject newSplitObject = TaskData.getTask(extras);
+                newButton.setText(newSplitObject.getName());
+                ConstraintLayout cl = findViewById(R.id.cl);
+                final Button holder = getHolder();
+                ViewGroup.LayoutParams lp = holder.getLayoutParams();
+                cl.addView(newButton, lp);
+                newButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View view) {
+                        Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
+                        taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
+                        startActivityForResult(taskIntent,1);
+                    }
+                });
+                numButtons++;
+            }
+            else if(requestCode == 1 && resultCode == Activity.RESULT_OK){
+                Long taskTime = data.getLongExtra("totalTimeLong",-1);
+                int splitObjectIndex = data.getIntExtra("splitObjectIndex",-1);
+                System.out.println(taskTime);
+                System.out.println(splitObjectIndex);
+                //store the result data from the timing screen
+                //make a call to the split object for the index to recalculate the average time
+
+            }
+
         }
+
         }
     }
 
