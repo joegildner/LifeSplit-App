@@ -34,6 +34,8 @@ public class SplitObject {
         return this.description;
     }
 
+    public Editable[] getSplitNamesArray(){return this.splitNames;}
+
     public Editable getSplitName(final int index) {
         return this.splitNames[index];
     }

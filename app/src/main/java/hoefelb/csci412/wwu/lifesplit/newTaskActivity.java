@@ -78,7 +78,7 @@ public class newTaskActivity extends AppCompatActivity {
                 //save data, return to previous screen
                 Editable taskTitle = titleText.getEditText().getText();
                 Editable taskDescription = desctiptionText.getEditText().getText();
-                Editable[] splitTitles = new Editable[numOfSplits];
+                Editable[] splitTitles = new Editable[numOfSplits-1];
                 for (int i = 0; i < numOfSplits-1; i++){
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();

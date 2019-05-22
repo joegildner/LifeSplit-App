@@ -16,11 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,12 +34,13 @@ import java.util.concurrent.TimeUnit;
 public class TimingScreen extends AppCompatActivity {
 
     public String[] names = {"Cook food", "Eat", "Put Away Dishes"};
-    public ArrayList<String> splitNames = new ArrayList<String>(Arrays.asList(names));
+    public ArrayList<Editable> splitNames;
     private boolean isPaused = true;
     private boolean isStarted = false;
     private boolean isCompleted = false;
     private int currentSplitIndex = 0;
     public TextView timer;
+    public TextView description;
     public Button pauseButton;
     public Button splitButton;
     private long totalTime=0;
@@ -60,8 +63,8 @@ public class TimingScreen extends AppCompatActivity {
         }
         SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
-        System.out.println(title);
-
+        splitNames = new ArrayList<Editable>(Arrays.asList(splitObject.getSplitNamesArray()));
+        //splitNames.addAll(Arrays.asList(splitObject.getSplitNamesArray()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timing_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.taskName);
@@ -77,9 +80,11 @@ public class TimingScreen extends AppCompatActivity {
         timer = (TextView)findViewById(R.id.timerText);
         pauseButton = (Button) findViewById(R.id.pause_button);
         splitButton = (Button) findViewById(R.id.split_button);
+        description = (TextView) findViewById(R.id.taskDescription);
 
         handler = new Handler();
         timer.setText("--:--:--");
+        description.setText(splitObject.getDescription());
 
         splitButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -210,9 +215,9 @@ public class TimingScreen extends AppCompatActivity {
 
         }
 
-        private List<String> mSplitNames;
+        private List<Editable> mSplitNames;
 
-        public SplitAdapter(List<String> splitNames){
+        public SplitAdapter(List<Editable> splitNames){
             mSplitNames = splitNames;
         }
 
@@ -226,7 +231,7 @@ public class TimingScreen extends AppCompatActivity {
         }
 
         public void onBindViewHolder(SplitAdapter.ViewHolder vHolder, int position){
-            String thisSplit = mSplitNames.get(position);
+            Editable thisSplit = mSplitNames.get(position);
             TextView nameText = vHolder.splitNameView;
 
             nameText.setText(thisSplit);
