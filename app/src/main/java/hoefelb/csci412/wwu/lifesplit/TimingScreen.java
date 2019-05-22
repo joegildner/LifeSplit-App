@@ -3,6 +3,7 @@ package hoefelb.csci412.wwu.lifesplit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -36,14 +37,20 @@ public class TimingScreen extends AppCompatActivity {
 
     public String[] names = {"Cook food", "Eat", "Put Away Dishes"};
     public ArrayList<Editable> splitNames;
+
+    private RecyclerView splitItems;
+    private int splitObjectIndex;
+
     private boolean isPaused = true;
     private boolean isStarted = false;
     private boolean isCompleted = false;
     private int currentSplitIndex = 0;
+
     public TextView timer;
     public TextView description;
     public Button pauseButton;
     public Button splitButton;
+
     private long totalTime=0;
     long milSecs;
     long startTime;
@@ -58,7 +65,7 @@ public class TimingScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         Intent context = getIntent();
-        final int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
@@ -72,7 +79,7 @@ public class TimingScreen extends AppCompatActivity {
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
-        final RecyclerView splitItems = (RecyclerView) findViewById(R.id.split_views);
+        splitItems = (RecyclerView) findViewById(R.id.split_views);
         final SplitAdapter sAdapter = new SplitAdapter(splitNames);
         splitItems.setAdapter(sAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -87,89 +94,101 @@ public class TimingScreen extends AppCompatActivity {
         timer.setText("--:--:--");
         description.setText(splitObject.getDescription());
 
-        splitButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(isCompleted)
-                    return;
-                if(isPaused&&!isStarted){
-                    //Start the stopwatch for the first time
-                    isPaused = false;
-                    isStarted = true;
-                    splitButton.setText("Split");
-                    startTime = SystemClock.uptimeMillis();
-                    handler.postDelayed(runnable, 0);
-                }
-                else if(isPaused){
-                    //Resume from last point.
-                    isPaused = false;
-                    splitButton.setText("Split");
-                    pauseButton.setText("Pause");
-                    startTime = SystemClock.uptimeMillis()-timeBuff;
-                    timeBuff=0;
-                    handler.postDelayed(runnable, 0);
-                }
-                else{
-                    //Take a split
-                    //reset timeBuff so pausing previous split will not affect future split
-                    LinearLayout current =  (LinearLayout)splitItems.getChildAt(currentSplitIndex);
-                    TextView splitTextView = (TextView)current.getChildAt(1);
-                    splitTextView.setText(toTimeFormat());
-                    handler.postDelayed(runnable, 0);
-                    startTime = SystemClock.uptimeMillis();
-                    timeBuff=0;
-                    currentSplitIndex++;
+        splitButton.setOnClickListener(splitButtonListener);
 
-                    if (currentSplitIndex == splitItems.getChildCount()){
-                        isCompleted = true;
-                        handler.removeCallbacks(runnable);
-                        System.out.println(totalTime);
-                        timer.setText(toTimeFormat(totalTime));
-                        //Save all the split data, get ready for handing back to parent activity
-                        //Perhaps keep the bottom timing view as total time, then pull value from that?
-                        Intent returnIntent = getIntent();
-                        returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
-                        returnIntent.putExtra("totalTimeLong",totalTime);
-                        setResult(Activity.RESULT_OK, returnIntent);
-                        TimingScreen.this.finish();
-                    }
-                    //CHECK FOR LAST SPLIT
-
-                }
-            }
-        });
-
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(isCompleted)
-                    return;
-                if(isStarted&&!isPaused){
-                    //Pause the timer
-                    splitButton.setText("Resume");
-                    pauseButton.setText("Reset");
-                    timeBuff += milSecs;
-                    handler.removeCallbacks(runnable);
-                    isPaused = true;
-                }
-                else if(isPaused){
-                    //Reset all the timers.
-                    splitButton.setText("Start");
-                    pauseButton.setText("Pause");
-                    isPaused= true;
-                    isStarted = false;
-                    timeBuff = 0;
-                    totalTime = 0;
-                    for(int i = 0; i < currentSplitIndex; i++){
-                        LinearLayout currentSplit = (LinearLayout) splitItems.getChildAt(i);
-                        TextView splitTextView = (TextView) currentSplit.getChildAt(1);
-                        splitTextView.setText("--:--:--");
-                    }
-                    timer.setText("--:--:--");
-                    currentSplitIndex = 0;
-                }
-            }
-        });
+        pauseButton.setOnClickListener(pauseButtonListener);
 
     }
+
+    private View.OnClickListener splitButtonListener = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            if(isPaused&&!isStarted){
+                //Start the stopwatch for the first time
+                isPaused = false;
+                isStarted = true;
+                splitButton.setText("Split");
+                startTime = SystemClock.uptimeMillis();
+                handler.postDelayed(runnable, 0);
+            }
+            else if(isPaused){
+                //Resume from last point.
+                isPaused = false;
+                splitButton.setText("Split");
+                pauseButton.setText("Pause");
+                startTime = SystemClock.uptimeMillis()-timeBuff;
+                timeBuff=0;
+                handler.postDelayed(runnable, 0);
+            }
+            else if(isCompleted){
+                //Save all the split data, get ready for handing back to parent activity
+                //Perhaps keep the bottom timing view as total time, then pull value from that?
+                Intent returnIntent = getIntent();
+                returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                returnIntent.putExtra("totalTimeLong",totalTime);
+                setResult(Activity.RESULT_OK, returnIntent);
+                TimingScreen.this.finish();
+            }
+            else{
+                //Take a split
+                //reset timeBuff so pausing previous split will not affect future split
+                LinearLayout current =  (LinearLayout)splitItems.getChildAt(currentSplitIndex);
+                TextView splitTextView = (TextView)current.getChildAt(1);
+                splitTextView.setText(toTimeFormat());
+                handler.postDelayed(runnable, 0);
+                startTime = SystemClock.uptimeMillis();
+                timeBuff=0;
+                currentSplitIndex++;
+
+                if (currentSplitIndex == splitItems.getChildCount()){
+                    isCompleted = true;
+                    handler.removeCallbacks(runnable);
+                    System.out.println(totalTime);
+                    timer.setText(toTimeFormat(totalTime));
+                    splitButton.setBackgroundColor(Color.CYAN);
+                    splitButton.setText("Save");
+                    pauseButton.setText("Reset");
+                    isPaused=true;
+
+
+                }
+                //CHECK FOR LAST SPLIT
+
+            }
+        }
+    };
+
+    private View.OnClickListener pauseButtonListener = new View.OnClickListener() {
+        public void onClick(View v) {
+
+            if(isStarted&&!isPaused){
+                //Pause the timer
+                splitButton.setText("Resume");
+                pauseButton.setText("Reset");
+                timeBuff += milSecs;
+                handler.removeCallbacks(runnable);
+                isPaused = true;
+            }
+            else if(isPaused){
+                //Reset all the timers and buttons
+                splitButton.setText("Start");
+                splitButton.setBackgroundColor(Color.parseColor("#45c15c"));
+                pauseButton.setText("Pause");
+                isPaused= true;
+                isStarted = false;
+                isCompleted = false;
+                timeBuff = 0;
+                totalTime = 0;
+                for(int i = 0; i < currentSplitIndex; i++){
+                    LinearLayout currentSplit = (LinearLayout) splitItems.getChildAt(i);
+                    TextView splitTextView = (TextView) currentSplit.getChildAt(1);
+                    splitTextView.setText("--:--:--");
+                }
+                timer.setText("--:--:--");
+                currentSplitIndex = 0;
+            }
+        }
+    };
 
 
     //to get current split's time, formatted as --:--:--
