@@ -103,7 +103,16 @@ public class TimingScreen extends AppCompatActivity {
     private View.OnClickListener splitButtonListener = new View.OnClickListener() {
         public void onClick(View v) {
 
-            if(isPaused&&!isStarted){
+            if(isCompleted){
+                //Save all the split data, get ready for handing back to parent activity
+                //Perhaps keep the bottom timing view as total time, then pull value from that?
+                Intent returnIntent = getIntent();
+                returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                returnIntent.putExtra("totalTimeLong",totalTime);
+                setResult(Activity.RESULT_OK, returnIntent);
+                TimingScreen.this.finish();
+            }
+            else if(isPaused&&!isStarted) {
                 //Start the stopwatch for the first time
                 isPaused = false;
                 isStarted = true;
@@ -119,15 +128,6 @@ public class TimingScreen extends AppCompatActivity {
                 startTime = SystemClock.uptimeMillis()-timeBuff;
                 timeBuff=0;
                 handler.postDelayed(runnable, 0);
-            }
-            else if(isCompleted){
-                //Save all the split data, get ready for handing back to parent activity
-                //Perhaps keep the bottom timing view as total time, then pull value from that?
-                Intent returnIntent = getIntent();
-                returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
-                returnIntent.putExtra("totalTimeLong",totalTime);
-                setResult(Activity.RESULT_OK, returnIntent);
-                TimingScreen.this.finish();
             }
             else{
                 //Take a split
