@@ -4,6 +4,7 @@ import android.text.Editable;
 
 /**
  * Created by wilso279 on 5/13/19.
+ * Object to store task data
  */
 
 public class SplitObject {
