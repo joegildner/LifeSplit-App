@@ -49,6 +49,10 @@
         <activity
             android:name=".MapsTaskActivity"
             android:label="@string/title_activity_maps_task"></activity>
+
+        <activity
+            android:name=".newMapsTaskActivity">
+        </activity>
     </application>
 
 </manifest>

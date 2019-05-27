@@ -69,6 +69,16 @@ public class TaskActivity extends AppCompatActivity {
                 startActivityForResult(newTaskIntent, 0);
             }
         });
+
+        final FloatingActionButton mapButton = findViewById(R.id.mapButton);
+        //mapButton.setBackgroundColor(Color.TRANSPARENT);
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent newTaskIntent = new Intent(TaskActivity.this, newMapsTaskActivity.class);
+                //newTaskIntent.putExtra("index", numButtons);
+                startActivityForResult(newTaskIntent, 0);
+            }
+        });
     }
 
     @Override
