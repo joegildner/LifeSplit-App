@@ -30,13 +30,13 @@ public class EditTaskActivity extends AppCompatActivity {
         final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
         //TaskData.init();
 
-        //get data from object
+        //get data from intent
         Intent context = getIntent();
-        int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        final int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
-        SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        SplitObject splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
         Editable description = splitObject.getDescription();
         Editable[] splitNames = splitObject.getSplitNamesArray();
@@ -96,7 +96,7 @@ public class EditTaskActivity extends AppCompatActivity {
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();
                 }
-                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
+                SplitObject newSplitObject = TaskData.editTask(splitObjectIndex, taskTitle,taskDescription,splitTitles);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);

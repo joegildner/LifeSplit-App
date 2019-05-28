@@ -27,6 +27,12 @@ public class SplitObject {
         this.avg = 0;
     }
 
+    public void editTask(final Editable name, final Editable description, final Editable[] splitNames) {
+        this.name = name;
+        this.description = description;
+        this.splitNames = splitNames;
+    }
+
     public Editable getName() {
         return this.name;
     }
