@@ -27,6 +27,7 @@ public class EditTaskActivity extends AppCompatActivity {
         final Button addSplitButton = findViewById(R.id.newTaskAddSplitButton);
         final Button resetScreenButton = findViewById(R.id.newTaskResetButton);
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
+        final Button deleteButton = findViewById(R.id.newTaskDeleteButton);
         final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
         //TaskData.init();
 
@@ -100,6 +101,18 @@ public class EditTaskActivity extends AppCompatActivity {
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
+                EditTaskActivity.this.finish();
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //save data, return to previous screen
+                TaskData.removeTask(splitObjectIndex);
+                Intent returnIntent = getIntent();
+                returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                setResult(Activity.RESULT_CANCELED, returnIntent);
                 EditTaskActivity.this.finish();
             }
         });

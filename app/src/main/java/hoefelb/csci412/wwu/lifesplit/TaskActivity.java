@@ -15,9 +15,15 @@ import android.widget.Button;
 
 import com.google.android.gms.tasks.Task;
 
+
 public class TaskActivity extends AppCompatActivity {
 
     private int numButtons = 0;
+    private Button buttonList[] = new Button[12];
+
+    final int CREATE = 0;
+    final int TIMING = 1;
+    final int DELETE = 2;
 
     //sets layout for buttons
     private Button getHolder() {
@@ -83,8 +89,8 @@ public class TaskActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        //user request code 2?
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+        //created task return
+        if (requestCode == CREATE && resultCode == Activity.RESULT_OK) {
             if (numButtons < 12) {
 
                 //create new button
@@ -113,21 +119,36 @@ public class TaskActivity extends AppCompatActivity {
                     public boolean onLongClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
                         taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
-                        startActivityForResult(taskIntent, 1);
+                        startActivityForResult(taskIntent, 2);
                         return true;
                     }
                 });
+                buttonList[numButtons] = newButton;
                 numButtons++;
             }
 
-        //user request code 1?
-        } else if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+        //timing screen return
+        } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
             Long taskTime = data.getLongExtra("totalTimeLong", -1);
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             //store the result data from the timing screen
             //make a call to the split object for the index to recalculate the average time
 
+            //edited task return
+        } else if (requestCode == DELETE && resultCode == Activity.RESULT_OK) {
+            int extras = data.getIntExtra("splitObjectIndex", -1);
+            final SplitObject newSplitObject = TaskData.getTask(extras);
+            Button curButton = buttonList[extras];
+            curButton.setText(newSplitObject.getName());
+
+            //deleted task return
+        } else if (requestCode == DELETE && resultCode == Activity.RESULT_CANCELED) {
+            int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
+            ConstraintLayout cl = findViewById(R.id.cl);
+            cl.removeView(buttonList[splitObjectIndex]);
+            numButtons--;
         }
+
     }
 }
 
