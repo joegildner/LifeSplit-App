@@ -105,10 +105,16 @@ public class TaskActivity extends AppCompatActivity {
                 newButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                        //Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
                         taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
                         startActivityForResult(taskIntent, 1);
-                        //startActivityForResult(taskIntent, 0);
+                    }
+                });
+                newButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    public boolean onLongClick(View view) {
+                        Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
+                        taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
+                        startActivityForResult(taskIntent, 1);
+                        return true;
                     }
                 });
                 numButtons++;
