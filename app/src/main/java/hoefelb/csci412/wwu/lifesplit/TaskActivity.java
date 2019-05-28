@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.tasks.Task;
+
 public class TaskActivity extends AppCompatActivity {
 
     private int numButtons = 0;
@@ -58,9 +60,20 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
+        TaskDBHandler handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
+                startActivityForResult(newTaskIntent, 0);
+            }
+        });
+
+        final FloatingActionButton mapButton = findViewById(R.id.mapButton);
+        //mapButton.setBackgroundColor(Color.TRANSPARENT);
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent newTaskIntent = new Intent(TaskActivity.this, newMapsTaskActivity.class);
+                //newTaskIntent.putExtra("index", numButtons);
                 startActivityForResult(newTaskIntent, 0);
             }
         });
@@ -103,8 +116,6 @@ public class TaskActivity extends AppCompatActivity {
         } else if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             Long taskTime = data.getLongExtra("totalTimeLong", -1);
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
-            System.out.println(taskTime);
-            System.out.println(splitObjectIndex);
             //store the result data from the timing screen
             //make a call to the split object for the index to recalculate the average time
 

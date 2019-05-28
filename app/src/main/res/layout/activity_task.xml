@@ -49,4 +49,13 @@
         app:layout_anchorGravity="right|bottom"
         app:srcCompat="@android:drawable/ic_menu_add" android:focusable="true"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/mapButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:layout_anchor="@+id/include2"
+        app:srcCompat="@android:drawable/ic_dialog_map"
+        app:layout_anchorGravity="left|bottom"/>
+
 </android.support.design.widget.CoordinatorLayout>

@@ -40,14 +40,32 @@ public class TaskDBHandler extends SQLiteOpenHelper {
                        SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
         myCR = context.getContentResolver();
+        SQLiteDatabase db = getWritableDatabase();
+
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        String CREATE_TASKS_TABLE = "CREATE TABLE "+ TABLE_TASKS +
+                "("+COLUMN_TASK_ID+" INTEGER PRIMARY KEY," + COLUMN_TASK_NAME+
+                " TEXT," + COLUMN_TASK_DESCRIPTION + " TEXT," + COLUMN_TASK_NUMBER_SPLITS +
+                " INTEGER," + COLUMN_TASK_AVERAGE_TIME +" LONG," + COLUMN_TASK_TIMES_RUN +
+                " INTEGER" + ")";
+        db.execSQL(CREATE_TASKS_TABLE);
+
+        String CREATE_SPLITS_TABLE = "CREATE TABLE "+ TABLE_SPLITS +
+                "("+COLUMN_SPLIT_ORDER_NUMBER+" INTEGER," + COLUMN_TASK_ID +" INTEGER,"+ COLUMN_SPLIT_NAME+
+                "TEXT," + COLUMN_SPLIT_AVERAGE_TIME + "LONG" + ")";
+        db.execSQL(CREATE_SPLITS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //not implemented for this project
+    }
+
+    public void populateTaskData(){
+
 
     }
 }
