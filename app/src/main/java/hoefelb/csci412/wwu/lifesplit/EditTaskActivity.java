@@ -29,7 +29,6 @@ public class EditTaskActivity extends AppCompatActivity {
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
         final Button deleteButton = findViewById(R.id.newTaskDeleteButton);
         final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
-        //TaskData.init();
 
         //get data from intent
         Intent context = getIntent();

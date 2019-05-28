@@ -23,7 +23,7 @@ public class TaskActivity extends AppCompatActivity {
 
     final int CREATE = 0;
     final int TIMING = 1;
-    final int DELETE = 2;
+    final int EDIT = 2;
 
     //sets layout for buttons
     private Button getHolder() {
@@ -70,7 +70,7 @@ public class TaskActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
-                startActivityForResult(newTaskIntent, 0);
+                startActivityForResult(newTaskIntent, CREATE);
             }
         });
 
@@ -94,7 +94,7 @@ public class TaskActivity extends AppCompatActivity {
             if (numButtons < 12) {
 
                 //create new button
-                Button newButton = new Button(TaskActivity.this);
+                final Button newButton = new Button(TaskActivity.this);
                 int extras = data.getIntExtra("splitObjectIndex", -1);
                 if (extras != -1) {
                     System.out.println(extras);
@@ -107,19 +107,19 @@ public class TaskActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams lp = holder.getLayoutParams();
                 cl.addView(newButton, lp);
 
-                //set new listener TODO: fix bug - old tasks crash app
+                //set new listener TODO: fix bug - old tasks crash app - undefined split object reference?
                 newButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
                         taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
-                        startActivityForResult(taskIntent, 1);
+                        startActivityForResult(taskIntent, TIMING);
                     }
                 });
                 newButton.setOnLongClickListener(new View.OnLongClickListener() {
                     public boolean onLongClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
                         taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
-                        startActivityForResult(taskIntent, 2);
+                        startActivityForResult(taskIntent, EDIT);
                         return true;
                     }
                 });
@@ -134,15 +134,15 @@ public class TaskActivity extends AppCompatActivity {
             //store the result data from the timing screen
             //make a call to the split object for the index to recalculate the average time
 
-            //edited task return
-        } else if (requestCode == DELETE && resultCode == Activity.RESULT_OK) {
+        //edited task return
+        } else if (requestCode == EDIT && resultCode == Activity.RESULT_OK) {
             int extras = data.getIntExtra("splitObjectIndex", -1);
             final SplitObject newSplitObject = TaskData.getTask(extras);
             Button curButton = buttonList[extras];
             curButton.setText(newSplitObject.getName());
 
-            //deleted task return
-        } else if (requestCode == DELETE && resultCode == Activity.RESULT_CANCELED) {
+        //deleted task return
+        } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             ConstraintLayout cl = findViewById(R.id.cl);
             cl.removeView(buttonList[splitObjectIndex]);
