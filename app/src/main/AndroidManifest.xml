@@ -47,6 +47,9 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".EditTaskActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity
             android:name=".MapsTaskActivity"
             android:label="@string/title_activity_maps_task"></activity>
 

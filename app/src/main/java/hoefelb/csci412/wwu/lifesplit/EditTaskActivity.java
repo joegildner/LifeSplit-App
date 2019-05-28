@@ -21,22 +21,38 @@ public class EditTaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_task);
+        setContentView(R.layout.activity_edit_task);
         final TextInputLayout titleText = findViewById(R.id.newTaskNameInput);
         final TextInputLayout descriptionText = findViewById(R.id.newTaskDesciptionInput);
         final Button addSplitButton = findViewById(R.id.newTaskAddSplitButton);
         final Button resetScreenButton = findViewById(R.id.newTaskResetButton);
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
         final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
-        TaskData.init();
+        //TaskData.init();
 
-        EditText newText = new EditText(getApplicationContext());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        newText.setLayoutParams(params);
-        newText.setId(numOfSplits);
-        newText.setHint("Split " + numOfSplits);
-        splitLayout.addView(newText);
-        numOfSplits++;
+        //get data from object
+        Intent context = getIntent();
+        int splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        if (splitObjectIndex == -1){
+            System.out.println("ERROR - ID not found");
+        }
+        SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        Editable title = splitObject.getName();
+        Editable description = splitObject.getDescription();
+        Editable[] splitNames = splitObject.getSplitNamesArray();
+
+        //add existing data
+        titleText.getEditText().setText(title);
+        descriptionText.getEditText().setText(description);
+        for(int i = 0; i < splitNames.length; i++) {
+            EditText newText = new EditText(getApplicationContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            newText.setLayoutParams(params);
+            newText.setId(numOfSplits+1);
+            newText.setText(splitNames[i]);
+            splitLayout.addView(newText);
+            numOfSplits++;
+        }
 
         addSplitButton.setOnClickListener(new View.OnClickListener() {
             @Override
