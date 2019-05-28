@@ -2,9 +2,9 @@ package hoefelb.csci412.wwu.lifesplit;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-public class newTaskActivity extends AppCompatActivity {
+/**
+ * Created by wilso279 on 5/27/19.
+ */
+
+public class EditTaskActivity extends AppCompatActivity {
     private int numOfSplits = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,7 @@ public class newTaskActivity extends AppCompatActivity {
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
-                newTaskActivity.this.finish();
+                EditTaskActivity.this.finish();
             }
         });
 
