@@ -10,10 +10,9 @@ import java.util.ArrayList;
 
 class TaskData {
 
-    private static ArrayList<SplitObject> taskData;
+     static ArrayList<SplitObject> taskData = new ArrayList<>();
 
     static void init(){
-        taskData = new ArrayList<>();
     }
 
     static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles) {

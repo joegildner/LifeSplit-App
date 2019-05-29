@@ -6,12 +6,15 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.Task;
 
@@ -26,7 +29,7 @@ public class TaskActivity extends AppCompatActivity {
     final int EDIT = 2;
 
     //sets layout for buttons
-    private Button getHolder() {
+ /*   private Button getHolder() {
         switch (numButtons) {
             case 0:
                 return findViewById(R.id.holder1);
@@ -54,7 +57,7 @@ public class TaskActivity extends AppCompatActivity {
                 return findViewById(R.id.holder12);
         }
         return findViewById(R.id.holder12);
-    }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,39 +94,40 @@ public class TaskActivity extends AppCompatActivity {
 
         //created task return
         if (requestCode == CREATE && resultCode == Activity.RESULT_OK) {
-            if (numButtons < 12) {
+            //if (numButtons < 12) {
 
                 //create new button
                 final Button newButton = new Button(TaskActivity.this);
-                int extras = data.getIntExtra("splitObjectIndex", -1);
-                if (extras != -1) {
-                    System.out.println(extras);
-                    System.out.println(TaskData.getTask(extras).getName());
-                }
-                final SplitObject newSplitObject = TaskData.getTask(extras);
+                final int index = data.getIntExtra("splitObjectIndex", -1);
+                if (index != -1) {
+                    System.out.println(index);
+                    System.out.println(TaskData.getTask(index).getName());
+              //  }
+                final SplitObject newSplitObject = TaskData.getTask(index);
                 newButton.setText(newSplitObject.getName());
-                ConstraintLayout cl = findViewById(R.id.cl);
-                final Button holder = getHolder();
-                ViewGroup.LayoutParams lp = holder.getLayoutParams();
-                cl.addView(newButton, lp);
+                final LinearLayout linearLayout = findViewById(R.id.linearLayout);
+                //final Button holder = getHolder();
+                //ViewGroup.LayoutParams lp = holder.getLayoutParams();
+                linearLayout.addView(newButton,numButtons);
 
-                //set new listener TODO: fix bug - old tasks crash app - undefined split object reference?
                 newButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                        taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
+                        LinearLayout parent =  (LinearLayout)view.getParent();
+                        System.out.println(parent.indexOfChild(view));
+                        taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
                         startActivityForResult(taskIntent, TIMING);
                     }
                 });
                 newButton.setOnLongClickListener(new View.OnLongClickListener() {
                     public boolean onLongClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
-                        taskIntent.putExtra("splitObjectIndex", TaskData.getIndex(newSplitObject));
+                        taskIntent.putExtra("splitObjectIndex", linearLayout.indexOfChild(view));
                         startActivityForResult(taskIntent, EDIT);
                         return true;
                     }
                 });
-                buttonList[numButtons] = newButton;
+                //buttonList[numButtons] = newButton;
                 numButtons++;
             }
 
@@ -144,8 +148,8 @@ public class TaskActivity extends AppCompatActivity {
         //deleted task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
-            ConstraintLayout cl = findViewById(R.id.cl);
-            cl.removeView(buttonList[splitObjectIndex]);
+            LinearLayout linearLayout = findViewById(R.id.linearLayout);
+            linearLayout.removeView(buttonList[splitObjectIndex]);
             numButtons--;
         }
 
