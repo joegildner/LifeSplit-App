@@ -2,14 +2,19 @@ package hoefelb.csci412.wwu.lifesplit;
 
 
 import android.text.Editable;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * Created by wilso279 on 5/29/19.
  */
 
 public class FirebaseLink {
+    static String data;
 
     public static void dbAdd(SplitObject newObject, int index) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -34,10 +39,29 @@ public class FirebaseLink {
             ref = db.getReference(objname + "/splitNames/splitName" + i);
             ref.setValue(splitNames[i].toString());
         }
+        dbPull();
     }
 
-    public static void dbGet() {
+    private static void dbPull() {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference("task0/name");
+        ref.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                data = value;
+            }
 
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+            }
+        });
     }
 
+    public static String getData() {
+        return data;
+    }
 }
