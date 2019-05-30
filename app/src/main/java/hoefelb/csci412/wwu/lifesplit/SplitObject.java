@@ -43,8 +43,18 @@ public class SplitObject {
 
     public Editable[] getSplitNamesArray(){return this.splitNames;}
 
+    public float[] getSplitTimesArray(){return this.splitTimes;}
+
     public Editable getSplitName(final int index) {
         return this.splitNames[index];
+    }
+
+    public int getCount() {
+        return this.count;
+    }
+
+    public float getAvg() {
+        return this.avg;
     }
 
     public float getSplitTime(final int index) {

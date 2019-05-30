@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 class TaskData {
 
-     static ArrayList<SplitObject> taskData = new ArrayList<>();
+    static ArrayList<SplitObject> taskData = new ArrayList<>();
 
     static void init(){
     }

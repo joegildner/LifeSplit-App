@@ -12,6 +12,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+
+
+
 public class newTaskActivity extends AppCompatActivity {
     private int numOfSplits = 1;
     @Override
@@ -77,7 +85,7 @@ public class newTaskActivity extends AppCompatActivity {
                     splitTitles[i] = currentText.getText();
                 }
                 SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
-                FirebaseLink.dbAdd(newSplitObject);
+                FirebaseLink.dbAdd(newSplitObject, TaskData.getIndex(newSplitObject));
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
@@ -86,4 +94,28 @@ public class newTaskActivity extends AppCompatActivity {
         });
 
     }
+
+//    public static void dbAdd(SplitObject newObject) {
+//        FirebaseDatabase db = FirebaseDatabase.getInstance();
+//        DatabaseReference ref = db.getReference("task1");
+//        ref.setValue(newObject.getSplitName(0).toString());
+//        //ref.setValue(newObject);
+//
+////         Read from the database
+////        ref.addValueEventListener(new ValueEventListener() {
+////            @Override
+////            public void onDataChange(DataSnapshot dataSnapshot) {
+////                // This method is called once with the initial value and again
+////                // whenever data at this location is updated.
+////                String value = dataSnapshot.getValue(String.class);
+////                //Log.d(TAG, "Value is: " + value);
+////            }
+////
+////            @Override
+////            public void onCancelled(DatabaseError error) {
+////                // Failed to read value
+////                //Log.w(TAG, "Failed to read value.", error.toException());
+////            }
+////        });
+//    }
 }
