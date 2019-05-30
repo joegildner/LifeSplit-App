@@ -35,4 +35,9 @@ public class FirebaseLink {
             ref.setValue(splitNames[i].toString());
         }
     }
+
+    public static void dbGet() {
+
+    }
+
 }

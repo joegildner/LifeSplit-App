@@ -94,28 +94,4 @@ public class newTaskActivity extends AppCompatActivity {
         });
 
     }
-
-//    public static void dbAdd(SplitObject newObject) {
-//        FirebaseDatabase db = FirebaseDatabase.getInstance();
-//        DatabaseReference ref = db.getReference("task1");
-//        ref.setValue(newObject.getSplitName(0).toString());
-//        //ref.setValue(newObject);
-//
-////         Read from the database
-////        ref.addValueEventListener(new ValueEventListener() {
-////            @Override
-////            public void onDataChange(DataSnapshot dataSnapshot) {
-////                // This method is called once with the initial value and again
-////                // whenever data at this location is updated.
-////                String value = dataSnapshot.getValue(String.class);
-////                //Log.d(TAG, "Value is: " + value);
-////            }
-////
-////            @Override
-////            public void onCancelled(DatabaseError error) {
-////                // Failed to read value
-////                //Log.w(TAG, "Failed to read value.", error.toException());
-////            }
-////        });
-//    }
 }
