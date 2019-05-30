@@ -77,6 +77,7 @@ public class newTaskActivity extends AppCompatActivity {
                     splitTitles[i] = currentText.getText();
                 }
                 SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
+                FirebaseLink.dbAdd(newSplitObject);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
