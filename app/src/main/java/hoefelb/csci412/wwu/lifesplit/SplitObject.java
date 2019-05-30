@@ -53,6 +53,8 @@ public class SplitObject {
         return this.count;
     }
 
+    public int getNumSplits(){return this.splitNames.length;}
+
     public float getAvg() {
         return this.avg;
     }

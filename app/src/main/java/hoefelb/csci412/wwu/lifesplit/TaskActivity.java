@@ -2,6 +2,7 @@ package hoefelb.csci412.wwu.lifesplit;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -22,11 +23,13 @@ import com.google.android.gms.tasks.Task;
 public class TaskActivity extends AppCompatActivity {
 
     private int numButtons = 0;
-    private Button buttonList[] = new Button[12];
+    SQLiteDatabase db;
 
     final int CREATE = 0;
     final int TIMING = 1;
     final int EDIT = 2;
+
+    private TaskDBHandler handler;
 
     //sets layout for buttons
  /*   private Button getHolder() {
@@ -70,7 +73,11 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
-        TaskDBHandler handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
+
+        handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
+//        Editable[] e = new Editable[1];
+//        e[0] = Editable.Factory.getInstance().newEditable("Split 1");
+        //handler.addTask(new SplitObject(Editable.Factory.getInstance().newEditable("Testtask"),Editable.Factory.getInstance().newEditable("TestTaskDesc"),e));
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
@@ -106,10 +113,12 @@ public class TaskActivity extends AppCompatActivity {
               //  }
                 final SplitObject newSplitObject = TaskData.getTask(index);
                 newButton.setText(newSplitObject.getName());
+                handler.addTask(TaskData.getTask(index));
                 final LinearLayout linearLayout = findViewById(R.id.linearLayout);
                 //final Button holder = getHolder();
                 //ViewGroup.LayoutParams lp = holder.getLayoutParams();
                 linearLayout.addView(newButton,numButtons);
+
 
                 newButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View view) {

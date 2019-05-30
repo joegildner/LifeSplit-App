@@ -6,6 +6,7 @@ package hoefelb.csci412.wwu.lifesplit;
 /**
  * Created by hoefelb on 5/22/19.
  */
+import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
@@ -17,6 +18,9 @@ import android.content.ContentResolver;
 
 public class TaskDBHandler extends SQLiteOpenHelper {
     private ContentResolver myCR;
+
+    //Make sure to increment/decrement this based on number of tasks
+    private int numOfTasks = 4;
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "taskDB.db";
@@ -35,12 +39,13 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_SPLIT_ORDER_NUMBER = "split_order_number";
     public static final String COLUMN_SPLIT_NAME = "split_name";
     public static final String COLUMN_SPLIT_AVERAGE_TIME = "split_average_time";
+    private final SQLiteDatabase db;
 
     public TaskDBHandler(Context context, String name,
                        SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
         myCR = context.getContentResolver();
-        SQLiteDatabase db = getWritableDatabase();
+        this.db = getWritableDatabase();
     }
 
     @Override
@@ -54,7 +59,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
         String CREATE_SPLITS_TABLE = "CREATE TABLE "+ TABLE_SPLITS +
                 "("+COLUMN_SPLIT_ORDER_NUMBER+" INTEGER," + COLUMN_TASK_ID +" INTEGER,"+ COLUMN_SPLIT_NAME+
-                "TEXT," + COLUMN_SPLIT_AVERAGE_TIME + "LONG" + ")";
+                " TEXT," + COLUMN_SPLIT_AVERAGE_TIME + " LONG" + ")";
         db.execSQL(CREATE_SPLITS_TABLE);
     }
 
@@ -64,7 +69,35 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     }
 
     public void addTask(SplitObject split){
+    //First, add the task
 
+        ContentValues taskValues = new ContentValues();
+        //REMEMBER TO CONSIDER DELETED TASKS FOR IDs
+        taskValues.put(COLUMN_TASK_ID,numOfTasks);
+        taskValues.put(COLUMN_TASK_NAME,split.getName().toString());
+        taskValues.put(COLUMN_TASK_DESCRIPTION,split.getDescription().toString());
+        taskValues.put(COLUMN_TASK_NUMBER_SPLITS,split.getNumSplits());
+        taskValues.put(COLUMN_TASK_AVERAGE_TIME,0);
+        taskValues.put(COLUMN_TASK_TIMES_RUN,0);
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.insert(TABLE_TASKS,null,taskValues);
+
+    //Next, add all the splits.
+        for(int i = 0; i < split.getNumSplits(); i++){
+            ContentValues splitValues = new ContentValues();
+            taskValues.put(COLUMN_SPLIT_ORDER_NUMBER,i);
+            //REMEMBER TO CONSIDER DELETED TASKS FOR IDs
+            splitValues.put(COLUMN_TASK_ID,numOfTasks);
+            splitValues.put(COLUMN_SPLIT_NAME,split.getSplitName(i).toString());
+            splitValues.put(COLUMN_SPLIT_AVERAGE_TIME,0.0);
+
+            db.insert(TABLE_SPLITS,null,splitValues);
+
+
+        }
+
+        numOfTasks++;
 
 
     }
