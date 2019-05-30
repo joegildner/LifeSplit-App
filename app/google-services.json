@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "537004801490",
+    "firebase_url": "https://lifesplit-cdc31.firebaseio.com",
+    "project_id": "lifesplit-cdc31",
+    "storage_bucket": "lifesplit-cdc31.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537004801490:android:915981cdbd927d56",
+        "android_client_info": {
+          "package_name": "hoefelb.csci412.wwu.lifesplit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "537004801490-j7f8b4ktr3632tn0f6n14oqv8l5pt5s8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hoefelb.csci412.wwu.lifesplit",
+            "certificate_hash": "d6914a390780a382a8a6418b675b1439cb52cb82"
+          }
+        },
+        {
+          "client_id": "537004801490-rii4v3se59jkkol28ljmcenoeald9fs1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmG7IrdLTfLXTyFl-_BqaInp8U4M-ftIA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "537004801490-rii4v3se59jkkol28ljmcenoeald9fs1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
