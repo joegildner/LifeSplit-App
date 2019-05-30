@@ -61,6 +61,7 @@ public class TaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,7 +123,7 @@ public class TaskActivity extends AppCompatActivity {
                 newButton.setOnLongClickListener(new View.OnLongClickListener() {
                     public boolean onLongClick(View view) {
                         Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
-                        taskIntent.putExtra("splitObjectIndex", linearLayout.indexOfChild(view));
+                        taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
                         startActivityForResult(taskIntent, EDIT);
                         return true;
                     }
@@ -142,14 +143,15 @@ public class TaskActivity extends AppCompatActivity {
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_OK) {
             int extras = data.getIntExtra("splitObjectIndex", -1);
             final SplitObject newSplitObject = TaskData.getTask(extras);
-            Button curButton = buttonList[extras];
+            LinearLayout linearLayout = findViewById(R.id.linearLayout);
+            Button curButton = (Button)linearLayout.getChildAt(extras);
             curButton.setText(newSplitObject.getName());
 
         //deleted task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             LinearLayout linearLayout = findViewById(R.id.linearLayout);
-            linearLayout.removeView(buttonList[splitObjectIndex]);
+            linearLayout.removeView(linearLayout.getChildAt(splitObjectIndex));
             numButtons--;
         }
 

@@ -41,7 +41,6 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
         myCR = context.getContentResolver();
         SQLiteDatabase db = getWritableDatabase();
-
     }
 
     @Override
@@ -62,6 +61,12 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //not implemented for this project
+    }
+
+    public void addTask(SplitObject split){
+
+
+
     }
 
     public void populateTaskData(){
