@@ -31,37 +31,6 @@ public class TaskActivity extends AppCompatActivity {
 
     private TaskDBHandler handler;
 
-    //sets layout for buttons
- /*   private Button getHolder() {
-        switch (numButtons) {
-            case 0:
-                return findViewById(R.id.holder1);
-            case 1:
-                return findViewById(R.id.holder2);
-            case 2:
-                return findViewById(R.id.holder3);
-            case 3:
-                return findViewById(R.id.holder4);
-            case 4:
-                return findViewById(R.id.holder5);
-            case 5:
-                return findViewById(R.id.holder6);
-            case 6:
-                return findViewById(R.id.holder7);
-            case 7:
-                return findViewById(R.id.holder8);
-            case 8:
-                return findViewById(R.id.holder9);
-            case 9:
-                return findViewById(R.id.holder10);
-            case 10:
-                return findViewById(R.id.holder11);
-            case 11:
-                return findViewById(R.id.holder12);
-        }
-        return findViewById(R.id.holder12);
-    }*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -94,6 +63,8 @@ public class TaskActivity extends AppCompatActivity {
                 startActivityForResult(newTaskIntent, 0);
             }
         });
+
+        generatePresetTasks();
     }
 
     //executes when floating action button returns
@@ -102,44 +73,16 @@ public class TaskActivity extends AppCompatActivity {
 
         //created task return
         if (requestCode == CREATE && resultCode == Activity.RESULT_OK) {
-            //if (numButtons < 12) {
 
                 //create new button
-                final Button newButton = new Button(TaskActivity.this);
                 final int index = data.getIntExtra("splitObjectIndex", -1);
                 if (index != -1) {
                     System.out.println(index);
                     System.out.println(TaskData.getTask(index).getName());
-              //  }
+                }
                 final SplitObject newSplitObject = TaskData.getTask(index);
-                newButton.setText(newSplitObject.getName());
-                handler.addTask(TaskData.getTask(index));
-                final LinearLayout linearLayout = findViewById(R.id.linearLayout);
-                //final Button holder = getHolder();
-                //ViewGroup.LayoutParams lp = holder.getLayoutParams();
-                linearLayout.addView(newButton,numButtons);
+                generateButton(newSplitObject);
 
-
-                newButton.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View view) {
-                        Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                        LinearLayout parent =  (LinearLayout)view.getParent();
-                        System.out.println(parent.indexOfChild(view));
-                        taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
-                        startActivityForResult(taskIntent, TIMING);
-                    }
-                });
-                newButton.setOnLongClickListener(new View.OnLongClickListener() {
-                    public boolean onLongClick(View view) {
-                        Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
-                        taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
-                        startActivityForResult(taskIntent, EDIT);
-                        return true;
-                    }
-                });
-                //buttonList[numButtons] = newButton;
-                numButtons++;
-            }
 
         //timing screen return
         } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
@@ -165,5 +108,98 @@ public class TaskActivity extends AppCompatActivity {
         }
 
     }
+
+    //generates the preset tasks
+    void generatePresetTasks() {
+        String title = "Morning Routine";
+        String description = "Typical morning routine for a user";
+        String morningSplits[] = new String[3];
+        morningSplits[0] = "Shower";
+        morningSplits[1] = "Eat breakfast";
+        morningSplits[2] = "Morning commute";
+        SplitObject preset = presetTask(title, description, morningSplits);
+        generateButton(preset);
+
+        title = "Groceries";
+        description = "Typical steps for buying groceries";
+        String grocerySplits[] = new String[5];
+        grocerySplits[0] = "Write list";
+        grocerySplits[1] = "Drive to store";
+        grocerySplits[2] = "Collect groceries";
+        grocerySplits[3] = "Checkout";
+        grocerySplits[4] = "Drive home";
+        preset = presetTask(title, description, grocerySplits);
+        generateButton(preset);
+
+        title = "Evening Routine";
+        description = "Typical evening routine for a user";
+        String eveningSplits[] = new String[3];
+        eveningSplits[0] = "Shower";
+        eveningSplits[1] = "Brush teeth";
+        eveningSplits[2] = "Sleep";
+        preset = presetTask(title, description, eveningSplits);
+        generateButton(preset);
+
+        title = "Cook";
+        description = "Typical steps needed to cook a meal";
+        String cookSplits[] = new String[4];
+        cookSplits[0] = "Prep ingredients";
+        cookSplits[1] = "Cook ingredients";
+        cookSplits[2] = "Plate food";
+        cookSplits[3] = "Serve food";
+        preset = presetTask(title, description, cookSplits);
+        generateButton(preset);
+
+        title = "Idk man";
+        description = "Someone come up with another of these";
+        String thingSplits[] = new String[2];
+        thingSplits[0] = "thing1";
+        thingSplits[1] = "thing2";
+        preset = presetTask(title, description, thingSplits);
+        generateButton(preset);
+    }
+
+    //generates a preset task based on the provided name and description
+    SplitObject presetTask(String title, String description, String splitStrings[]) {
+        Editable.Factory factory = Editable.Factory.getInstance();
+        Editable taskTitle = factory.newEditable(title);
+        Editable taskDescription = factory.newEditable(description);
+        int numSplits = splitStrings.length;
+        Editable[] splitTitles = new Editable[numSplits];
+        for(int i = 0; i < numSplits; i++) {
+            splitTitles[i] = factory.newEditable(splitStrings[i]);
+        }
+        return TaskData.addTask(taskTitle, taskDescription, splitTitles);
+    }
+
+    //generates a button in the view for the provided SplitObject
+    void generateButton(SplitObject newObject) {
+        final Button newButton = new Button(TaskActivity.this);
+        newButton.setText(newObject.getName());
+        handler.addTask(TaskData.getTask(0));
+        final LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        linearLayout.addView(newButton,numButtons);
+
+
+        newButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
+                LinearLayout parent =  (LinearLayout)view.getParent();
+                System.out.println(parent.indexOfChild(view));
+                taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
+                startActivityForResult(taskIntent, TIMING);
+            }
+        });
+        newButton.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View view) {
+                Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
+                taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
+                startActivityForResult(taskIntent, EDIT);
+                return true;
+            }
+        });
+        numButtons++;
+    }
+
 }
 
