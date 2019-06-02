@@ -14,8 +14,10 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class FirebaseLink {
-    static String data;
+    static float[] taskAvg;
+    static int[] taskCount;
 
+    //add complete object to firebase
     public static void dbAdd(SplitObject newObject, int index) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         String objname = "task" + (index);
@@ -39,19 +41,47 @@ public class FirebaseLink {
             ref = db.getReference(objname + "/splitNames/splitName" + i);
             ref.setValue(splitNames[i].toString());
         }
-        dbPull();
     }
 
-    private static void dbPull() {
+    public static void dbUpdate(final int index, final int time) {
+        int count = taskCount[index] + 1;
+        float newAvg = ((taskAvg[index] * (count-1)) + time) / count;
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference("task0/name");
+        String objname = "task" + (index);
+        DatabaseReference ref = db.getReference(objname + "/avg");
+        ref.setValue(Float.toString(newAvg));
+        ref = db.getReference(objname + "/count");
+        ref.setValue(Integer.toString(count));
+        taskAvg[index] = newAvg;
+        taskCount[index] = count;
+    }
+
+    public static void dbPull(final int index) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference(("task"+ index + "/avg"));
         ref.addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 String value = dataSnapshot.getValue(String.class);
-                data = value;
+                taskAvg[index] = Integer.valueOf(value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+            }
+        });
+
+        ref = db.getReference(("task"+ index + "/count"));
+        ref.addListenerForSingleValueEvent(new ValueEventListener(){
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                taskCount[index] = Integer.valueOf(value);
             }
 
             @Override
@@ -61,7 +91,7 @@ public class FirebaseLink {
         });
     }
 
-    public static String getData() {
-        return data;
+    public static float getGlobalAvg(int index) {
+        return taskAvg[index];
     }
 }
