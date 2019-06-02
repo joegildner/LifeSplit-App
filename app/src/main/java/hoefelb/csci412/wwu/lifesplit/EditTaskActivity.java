@@ -97,7 +97,6 @@ public class EditTaskActivity extends AppCompatActivity {
                     splitTitles[i] = currentText.getText();
                 }
                 SplitObject newSplitObject = TaskData.editTask(splitObjectIndex, taskTitle,taskDescription,splitTitles);
-                FirebaseLink.dbAdd(newSplitObject, splitObjectIndex);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);

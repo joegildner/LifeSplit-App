@@ -65,6 +65,7 @@ public class TaskActivity extends AppCompatActivity {
         });
 
         generatePresetTasks();
+        FirebaseLink.dbPullAll();
     }
 
     //executes when floating action button returns
@@ -183,6 +184,7 @@ public class TaskActivity extends AppCompatActivity {
 
         newButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                FirebaseLink.dbPullAll();
                 Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
                 LinearLayout parent =  (LinearLayout)view.getParent();
                 System.out.println(parent.indexOfChild(view));

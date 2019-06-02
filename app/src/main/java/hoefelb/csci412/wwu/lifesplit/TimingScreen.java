@@ -95,7 +95,6 @@ public class TimingScreen extends AppCompatActivity {
         localAvg.setText("Average: " + Float.toString(splitObject.getAvg()));
         int preset = splitObject.getPresetNum();
         if(preset != -1) {
-            FirebaseLink.populate();
             globalAvg.setText("Global Average: " + Float.toString(FirebaseLink.getGlobalAvg(preset)));
         } else {
             globalAvg.setText("");
