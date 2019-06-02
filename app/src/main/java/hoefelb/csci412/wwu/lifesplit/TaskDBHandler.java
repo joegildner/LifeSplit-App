@@ -42,8 +42,8 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_SPLIT_ORDER_NUMBER = "split_order_number";
     public static final String COLUMN_SPLIT_NAME = "split_name";
     public static final String COLUMN_SPLIT_AVERAGE_TIME = "split_average_time";
-    private final SQLiteDatabase db;
-    private int largestTaskID;
+    private SQLiteDatabase db = getWritableDatabase();
+    private int largestTaskID = 0;
 
     public TaskDBHandler(Context context, String name,
                        SQLiteDatabase.CursorFactory factory, int version) {
@@ -75,19 +75,17 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         //not implemented for this project
     }
 
-    public void addTask(SplitObject split){
+    public void addTask(SplitObject split,SQLiteDatabase db){
     //First, add the task
 
         ContentValues taskValues = new ContentValues();
         //REMEMBER TO CONSIDER DELETED TASKS FOR IDs
-        taskValues.put(COLUMN_TASK_ID,numOfTasks);
+        taskValues.put(COLUMN_TASK_ID,largestTaskID);
         taskValues.put(COLUMN_TASK_NAME,split.getName().toString());
         taskValues.put(COLUMN_TASK_DESCRIPTION,split.getDescription().toString());
         taskValues.put(COLUMN_TASK_NUMBER_SPLITS,split.getNumSplits());
         taskValues.put(COLUMN_TASK_AVERAGE_TIME,0);
         taskValues.put(COLUMN_TASK_TIMES_RUN,0);
-
-        SQLiteDatabase db = getWritableDatabase();
         db.insert(TABLE_TASKS,null,taskValues);
 
     //Next, add all the splits.
@@ -95,7 +93,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
             ContentValues splitValues = new ContentValues();
             taskValues.put(COLUMN_SPLIT_ORDER_NUMBER,i);
             //REMEMBER TO CONSIDER DELETED TASKS FOR IDs
-            splitValues.put(COLUMN_TASK_ID,numOfTasks);
+            splitValues.put(COLUMN_TASK_ID,largestTaskID);
             splitValues.put(COLUMN_SPLIT_NAME,split.getSplitName(i).toString());
             splitValues.put(COLUMN_SPLIT_AVERAGE_TIME,0.0);
 
@@ -104,24 +102,26 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
         }
 
-        numOfTasks++;
+        largestTaskID++;
 
 
     }
 
-    public void populateTaskData(SQLiteDatabase db){
+    public void populateTaskData(){
         String taskSQLQuery = "Select * from " + TABLE_TASKS;
         Cursor c = db.rawQuery(taskSQLQuery,null);
-        if(c.moveToFirst()){
-            do
-                createSplitObjectFromSQLite(c,db);
+        if(c.moveToFirst())
+            do {
+                createSplitObjectFromSQLite(c, db);
+            }
             while(c.moveToNext());
             //there are tasks in sqlite. add them one at a time.
-        }
 
-
-
-
+        //get max id for future inserts
+        taskSQLQuery = "Select max(" + COLUMN_TASK_ID + ") from " + TABLE_TASKS;
+        c = db.rawQuery(taskSQLQuery,null);
+        if(c.moveToFirst())
+            largestTaskID = c.getInt(0) + 1;
     }
 
     private void createSplitObjectFromSQLite (Cursor c, SQLiteDatabase db){
@@ -134,7 +134,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
         //get the split information from splits
         Editable[] task_descriptions = getTaskDescriptionsFromSQLite(task_id,task_number_splits, db);
-        TaskData.addTask(task_name,task_description,task_descriptions,task_average_time,task_times_run);
+        TaskData.addTaskExisting(task_name,task_description,task_descriptions,task_average_time,task_times_run);
 
     }
 
@@ -144,17 +144,75 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         String taskSQLQuery = "Select * from " + TABLE_SPLITS +
                                 " Where task_id = \"" + id+"\"";
         Cursor d = db.rawQuery(taskSQLQuery,null);
+        if(d.moveToFirst())
         do{
-            if(d.moveToFirst()){
                 returnArray[returnArrayPos] = new SpannableStringBuilder(d.getString(2));
-            }
         }
         while(d.moveToNext());
         return returnArray;
     }
 
     private void addPresetTasksToDB(SQLiteDatabase db){
+//        String title = "Morning Routine";
+//        String description = "Typical morning routine for a user";
+//        String morningSplits[] = new String[3];
+//        morningSplits[0] = "Shower";
+//        morningSplits[1] = "Eat breakfast";
+//        morningSplits[2] = "Morning commute";
+//        SplitObject preset = presetTask(title, description, morningSplits);
+//        generateButton(preset);
+//
+//        title = "Groceries";
+//        description = "Typical steps for buying groceries";
+//        String grocerySplits[] = new String[5];
+//        grocerySplits[0] = "Write list";
+//        grocerySplits[1] = "Drive to store";
+//        grocerySplits[2] = "Collect groceries";
+//        grocerySplits[3] = "Checkout";
+//        grocerySplits[4] = "Drive home";
+//        preset = presetTask(title, description, grocerySplits);
+//        generateButton(preset);
+//
+//        title = "Evening Routine";
+//        description = "Typical evening routine for a user";
+//        String eveningSplits[] = new String[3];
+//        eveningSplits[0] = "Shower";
+//        eveningSplits[1] = "Brush teeth";
+//        eveningSplits[2] = "Sleep";
+//        preset = presetTask(title, description, eveningSplits);
+//        generateButton(preset);
+//
+//        title = "Cook";
+//        description = "Typical steps needed to cook a meal";
+//        String cookSplits[] = new String[4];
+//        cookSplits[0] = "Prep ingredients";
+//        cookSplits[1] = "Cook ingredients";
+//        cookSplits[2] = "Plate food";
+//        cookSplits[3] = "Serve food";
+//        preset = presetTask(title, description, cookSplits);
+//        generateButton(preset);
+//
+//        title = "Idk man";
+//        description = "Someone come up with another of these";
+//        String thingSplits[] = new String[2];
+//        thingSplits[0] = "thing1";
+//        thingSplits[1] = "thing2";
+//        preset = presetTask(title, description, thingSplits);
+//        generateButton(preset);
+        Editable.Factory factory = Editable.Factory.getInstance();
 
     }
 
+
+    SplitObject presetTask(String title, String description, String splitStrings[]) {
+        Editable.Factory factory = Editable.Factory.getInstance();
+        Editable taskTitle = factory.newEditable(title);
+        Editable taskDescription = factory.newEditable(description);
+        int numSplits = splitStrings.length;
+        Editable[] splitTitles = new Editable[numSplits];
+        for(int i = 0; i < numSplits; i++) {
+            splitTitles[i] = factory.newEditable(splitStrings[i]);
+        }
+        return TaskData.addTask(taskTitle, taskDescription, splitTitles);
+    }
 }

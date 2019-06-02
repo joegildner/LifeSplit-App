@@ -22,8 +22,13 @@ class TaskData {
         return newSplitObject;
     }
 
-    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
-        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles,averageTime,timesRun);
+    static SplitObject addTaskExisting(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles);
+        for(int i = 0; i < splitTitles.length; i++) {
+            newSplitObject.setSplitTime(i,0);
+       }
+       newSplitObject.setAverageTime(averageTime.floatValue());
+        newSplitObject.setTimesRun(timesRun);
         taskData.add(newSplitObject);
         return newSplitObject;
 
@@ -47,5 +52,13 @@ class TaskData {
 
     static void removeTask(int index) {
         taskData.remove(index);
+    }
+
+    static int getIndexSize(){
+        return taskData.size();
+    }
+
+    static void clearArrayList(){
+        taskData = new ArrayList<>();
     }
 }

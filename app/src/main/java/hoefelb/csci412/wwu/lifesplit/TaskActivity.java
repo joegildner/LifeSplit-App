@@ -33,7 +33,6 @@ public class TaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -42,8 +41,17 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
+        //getApplicationContext().deleteDatabase("taskDB.db");
+        //System.out.println("YEET");
+        //System.exit(0);
+        this.handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
+        this.handler.populateTaskData();
+        //Add all the buttons
+        int taskDataSize = TaskData.getIndexSize();
+        for(int i = 0; i < taskDataSize; i++){
+            generateButton(TaskData.getTask(i));
+        }
 
-        handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
 //        Editable[] e = new Editable[1];
 //        e[0] = Editable.Factory.getInstance().newEditable("Split 1");
         //handler.addTask(new SplitObject(Editable.Factory.getInstance().newEditable("Testtask"),Editable.Factory.getInstance().newEditable("TestTaskDesc"),e));
@@ -81,6 +89,7 @@ public class TaskActivity extends AppCompatActivity {
                     System.out.println(TaskData.getTask(index).getName());
                 }
                 final SplitObject newSplitObject = TaskData.getTask(index);
+                handler.addTask(newSplitObject,handler.getWritableDatabase());
                 generateButton(newSplitObject);
 
 
@@ -111,52 +120,55 @@ public class TaskActivity extends AppCompatActivity {
 
     //generates the preset tasks
     void generatePresetTasks() {
-        String title = "Morning Routine";
-        String description = "Typical morning routine for a user";
-        String morningSplits[] = new String[3];
-        morningSplits[0] = "Shower";
-        morningSplits[1] = "Eat breakfast";
-        morningSplits[2] = "Morning commute";
-        SplitObject preset = presetTask(title, description, morningSplits);
-        generateButton(preset);
+        //Done in TaskDBHandler.java
 
-        title = "Groceries";
-        description = "Typical steps for buying groceries";
-        String grocerySplits[] = new String[5];
-        grocerySplits[0] = "Write list";
-        grocerySplits[1] = "Drive to store";
-        grocerySplits[2] = "Collect groceries";
-        grocerySplits[3] = "Checkout";
-        grocerySplits[4] = "Drive home";
-        preset = presetTask(title, description, grocerySplits);
-        generateButton(preset);
 
-        title = "Evening Routine";
-        description = "Typical evening routine for a user";
-        String eveningSplits[] = new String[3];
-        eveningSplits[0] = "Shower";
-        eveningSplits[1] = "Brush teeth";
-        eveningSplits[2] = "Sleep";
-        preset = presetTask(title, description, eveningSplits);
-        generateButton(preset);
-
-        title = "Cook";
-        description = "Typical steps needed to cook a meal";
-        String cookSplits[] = new String[4];
-        cookSplits[0] = "Prep ingredients";
-        cookSplits[1] = "Cook ingredients";
-        cookSplits[2] = "Plate food";
-        cookSplits[3] = "Serve food";
-        preset = presetTask(title, description, cookSplits);
-        generateButton(preset);
-
-        title = "Idk man";
-        description = "Someone come up with another of these";
-        String thingSplits[] = new String[2];
-        thingSplits[0] = "thing1";
-        thingSplits[1] = "thing2";
-        preset = presetTask(title, description, thingSplits);
-        generateButton(preset);
+//        String title = "Morning Routine";
+//        String description = "Typical morning routine for a user";
+//        String morningSplits[] = new String[3];
+//        morningSplits[0] = "Shower";
+//        morningSplits[1] = "Eat breakfast";
+//        morningSplits[2] = "Morning commute";
+//        SplitObject preset = presetTask(title, description, morningSplits);
+//        generateButton(preset);
+//
+//        title = "Groceries";
+//        description = "Typical steps for buying groceries";
+//        String grocerySplits[] = new String[5];
+//        grocerySplits[0] = "Write list";
+//        grocerySplits[1] = "Drive to store";
+//        grocerySplits[2] = "Collect groceries";
+//        grocerySplits[3] = "Checkout";
+//        grocerySplits[4] = "Drive home";
+//        preset = presetTask(title, description, grocerySplits);
+//        generateButton(preset);
+//
+//        title = "Evening Routine";
+//        description = "Typical evening routine for a user";
+//        String eveningSplits[] = new String[3];
+//        eveningSplits[0] = "Shower";
+//        eveningSplits[1] = "Brush teeth";
+//        eveningSplits[2] = "Sleep";
+//        preset = presetTask(title, description, eveningSplits);
+//        generateButton(preset);
+//
+//        title = "Cook";
+//        description = "Typical steps needed to cook a meal";
+//        String cookSplits[] = new String[4];
+//        cookSplits[0] = "Prep ingredients";
+//        cookSplits[1] = "Cook ingredients";
+//        cookSplits[2] = "Plate food";
+//        cookSplits[3] = "Serve food";
+//        preset = presetTask(title, description, cookSplits);
+//        generateButton(preset);
+//
+//        title = "Idk man";
+//        description = "Someone come up with another of these";
+//        String thingSplits[] = new String[2];
+//        thingSplits[0] = "thing1";
+//        thingSplits[1] = "thing2";
+//        preset = presetTask(title, description, thingSplits);
+//        generateButton(preset);
     }
 
     //generates a preset task based on the provided name and description
@@ -176,7 +188,6 @@ public class TaskActivity extends AppCompatActivity {
     void generateButton(SplitObject newObject) {
         final Button newButton = new Button(TaskActivity.this);
         newButton.setText(newObject.getName());
-        handler.addTask(TaskData.getTask(0));
         final LinearLayout linearLayout = findViewById(R.id.linearLayout);
         linearLayout.addView(newButton,numButtons);
 
