@@ -76,6 +76,10 @@ public class SplitObject {
         return this.avg;
     }
 
+    public int getPresetNum() {
+        return this.presetNum;
+    }
+
     public float getSplitTime(final int index) {
         return this.splitTimes[index];
     }

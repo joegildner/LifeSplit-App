@@ -14,8 +14,8 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class FirebaseLink {
-    static float[] taskAvg;
-    static int[] taskCount;
+    static float[] taskAvg = new float[5];
+    static int[] taskCount = new int[5];
 
     //add complete object to firebase
     public static void dbAdd(SplitObject newObject, int index) {
@@ -55,6 +55,15 @@ public class FirebaseLink {
         taskAvg[index] = newAvg;
         taskCount[index] = count;
     }
+
+    public static void populate() {
+        for(int i = 0; i < 4; i++) {
+            taskAvg[i] = 0;
+            taskCount[i] = 0;
+        }
+    }
+
+
 
     public static void dbPull(final int index) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();

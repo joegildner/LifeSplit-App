@@ -117,7 +117,7 @@ public class TaskActivity extends AppCompatActivity {
         morningSplits[0] = "Shower";
         morningSplits[1] = "Eat breakfast";
         morningSplits[2] = "Morning commute";
-        SplitObject preset = presetTask(title, description, morningSplits, 1);
+        SplitObject preset = presetTask(title, description, morningSplits, 0);
         generateButton(preset);
 
         title = "Groceries";
@@ -128,7 +128,7 @@ public class TaskActivity extends AppCompatActivity {
         grocerySplits[2] = "Collect groceries";
         grocerySplits[3] = "Checkout";
         grocerySplits[4] = "Drive home";
-        preset = presetTask(title, description, grocerySplits, 2);
+        preset = presetTask(title, description, grocerySplits, 1);
         generateButton(preset);
 
         title = "Evening Routine";
@@ -137,7 +137,7 @@ public class TaskActivity extends AppCompatActivity {
         eveningSplits[0] = "Shower";
         eveningSplits[1] = "Brush teeth";
         eveningSplits[2] = "Sleep";
-        preset = presetTask(title, description, eveningSplits, 3);
+        preset = presetTask(title, description, eveningSplits, 2);
         generateButton(preset);
 
         title = "Cook";
@@ -147,7 +147,7 @@ public class TaskActivity extends AppCompatActivity {
         cookSplits[1] = "Cook ingredients";
         cookSplits[2] = "Plate food";
         cookSplits[3] = "Serve food";
-        preset = presetTask(title, description, cookSplits, 4);
+        preset = presetTask(title, description, cookSplits, 3);
         generateButton(preset);
 
         title = "Idk man";
@@ -155,7 +155,7 @@ public class TaskActivity extends AppCompatActivity {
         String thingSplits[] = new String[2];
         thingSplits[0] = "thing1";
         thingSplits[1] = "thing2";
-        preset = presetTask(title, description, thingSplits, 5);
+        preset = presetTask(title, description, thingSplits, 4);
         generateButton(preset);
     }
 
