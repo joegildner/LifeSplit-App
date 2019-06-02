@@ -134,7 +134,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
         //get the split information from splits
         Editable[] task_descriptions = getTaskDescriptionsFromSQLite(task_id,task_number_splits, db);
-        TaskData.addTask(task_name,task_description,task_descriptions,task_average_time,task_times_run);
+        TaskData.addTask(task_name,task_description,task_descriptions,task_average_time,task_times_run, -1);
 
     }
 

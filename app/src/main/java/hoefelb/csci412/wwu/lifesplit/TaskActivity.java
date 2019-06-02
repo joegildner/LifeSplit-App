@@ -117,7 +117,7 @@ public class TaskActivity extends AppCompatActivity {
         morningSplits[0] = "Shower";
         morningSplits[1] = "Eat breakfast";
         morningSplits[2] = "Morning commute";
-        SplitObject preset = presetTask(title, description, morningSplits);
+        SplitObject preset = presetTask(title, description, morningSplits, 1);
         generateButton(preset);
 
         title = "Groceries";
@@ -128,7 +128,7 @@ public class TaskActivity extends AppCompatActivity {
         grocerySplits[2] = "Collect groceries";
         grocerySplits[3] = "Checkout";
         grocerySplits[4] = "Drive home";
-        preset = presetTask(title, description, grocerySplits);
+        preset = presetTask(title, description, grocerySplits, 2);
         generateButton(preset);
 
         title = "Evening Routine";
@@ -137,7 +137,7 @@ public class TaskActivity extends AppCompatActivity {
         eveningSplits[0] = "Shower";
         eveningSplits[1] = "Brush teeth";
         eveningSplits[2] = "Sleep";
-        preset = presetTask(title, description, eveningSplits);
+        preset = presetTask(title, description, eveningSplits, 3);
         generateButton(preset);
 
         title = "Cook";
@@ -147,7 +147,7 @@ public class TaskActivity extends AppCompatActivity {
         cookSplits[1] = "Cook ingredients";
         cookSplits[2] = "Plate food";
         cookSplits[3] = "Serve food";
-        preset = presetTask(title, description, cookSplits);
+        preset = presetTask(title, description, cookSplits, 4);
         generateButton(preset);
 
         title = "Idk man";
@@ -155,12 +155,12 @@ public class TaskActivity extends AppCompatActivity {
         String thingSplits[] = new String[2];
         thingSplits[0] = "thing1";
         thingSplits[1] = "thing2";
-        preset = presetTask(title, description, thingSplits);
+        preset = presetTask(title, description, thingSplits, 5);
         generateButton(preset);
     }
 
     //generates a preset task based on the provided name and description
-    SplitObject presetTask(String title, String description, String splitStrings[]) {
+    SplitObject presetTask(final String title, final String description, final String splitStrings[], final int taskNum) {
         Editable.Factory factory = Editable.Factory.getInstance();
         Editable taskTitle = factory.newEditable(title);
         Editable taskDescription = factory.newEditable(description);
@@ -169,7 +169,7 @@ public class TaskActivity extends AppCompatActivity {
         for(int i = 0; i < numSplits; i++) {
             splitTitles[i] = factory.newEditable(splitStrings[i]);
         }
-        return TaskData.addTask(taskTitle, taskDescription, splitTitles);
+        return TaskData.addTask(taskTitle, taskDescription, splitTitles, taskNum);
     }
 
     //generates a button in the view for the provided SplitObject

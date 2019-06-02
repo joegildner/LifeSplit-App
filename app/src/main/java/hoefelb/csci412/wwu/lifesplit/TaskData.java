@@ -15,15 +15,16 @@ class TaskData {
     static void init(){
     }
 
-    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles) {
-        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles);
+    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles, final int taskNum) {
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles, taskNum);
 
         taskData.add(newSplitObject);
         return newSplitObject;
     }
 
-    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
-        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles,averageTime,timesRun);
+    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription,
+                               final Editable[] splitTitles, final Long averageTime, final int timesRun, final int taskNum){
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles, averageTime, timesRun, taskNum);
         taskData.add(newSplitObject);
         return newSplitObject;
 
