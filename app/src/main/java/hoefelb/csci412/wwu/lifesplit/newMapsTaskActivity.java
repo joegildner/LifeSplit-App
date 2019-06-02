@@ -13,11 +13,13 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,10 +37,21 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -70,8 +83,13 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
     private boolean aSet = false;
     private boolean bSet = false;
-    private Marker bMarker;
+
     private Marker aMarker;
+    private LatLng aLatLng;
+    private Marker bMarker;
+    private LatLng bLatLng;
+    private Polyline directions;
+
     private TextView infoText;
     private String defText;
 
@@ -167,6 +185,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         public void onMapClick(LatLng point) {
             MarkerOptions markerOptions = new MarkerOptions().position(point);
             aMarker = mMap.addMarker(markerOptions);
+            aLatLng = point;
 
             aButton.setText("Reset A");
             aButton.setOnClickListener(resetA);
@@ -176,6 +195,15 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
             if(bSet) bButton.setOnClickListener(resetB);
             else bButton.setOnClickListener(setB);
+
+            if(aLatLng != null && bLatLng != null){
+                String url = getDirectionsUrl(aLatLng, bLatLng);
+
+                DownloadTask downloadTask = new DownloadTask();
+
+                downloadTask.execute(url);
+            }
+
         }
     };
 
@@ -184,7 +212,9 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
             aButton.setText("Set A");
             aButton.setOnClickListener(setA);
             aMarker.remove();
+            directions.remove();
             aMarker = null;
+            aLatLng = null;
             aSet = false;
 
         }
@@ -204,6 +234,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         public void onMapClick(LatLng point) {
             MarkerOptions markerOptions = new MarkerOptions().position(point).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             bMarker = mMap.addMarker(markerOptions);
+            bLatLng = point;
 
 
             bButton.setText("Reset B");
@@ -214,6 +245,14 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
             if(aSet) aButton.setOnClickListener(resetA);
             else aButton.setOnClickListener(setA);
+
+            if(aLatLng != null && bLatLng != null){
+                String url = getDirectionsUrl(aLatLng, bLatLng);
+                System.out.println(url);
+                DownloadTask downloadTask = new DownloadTask();
+
+                downloadTask.execute(url);
+            }
         }
     };
 
@@ -222,7 +261,9 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
             bButton.setText("Set B");
             bButton.setOnClickListener(setB);
             bMarker.remove();
+            directions.remove();
             bMarker = null;
+            bLatLng = null;
 
             bSet = false;
 
@@ -318,6 +359,153 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
                 return;
             }
         }
+    }
+
+    private class DownloadTask extends AsyncTask {
+
+        @Override
+        protected String doInBackground(Object[] url) {
+
+            String data = "";
+
+            try {
+                data = downloadUrl((String)url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+
+            System.out.println(data);
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(Object result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+            parserTask.execute((String)result);
+
+        }
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String,String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String,String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println(routes.toString());
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String,String>>> result) {
+            ArrayList points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+            for (int i = 0; i < result.size(); i++) {
+                System.out.println("REACHED");
+                points = new ArrayList();
+                lineOptions = new PolylineOptions();
+
+                List<HashMap<String,String>> path = result.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String,String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                lineOptions.addAll(points);
+                lineOptions.width(12);
+                lineOptions.color(Color.RED);
+                lineOptions.geodesic(true);
+
+            }
+
+            directions = mMap.addPolyline(lineOptions);
+
+        }
+    }
+
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        //&key=<YOUR_API_KEY>
+        String api_key = "key=" + "AIzaSyDX-E1J2cTe3aQJxId6vh_HPsFXQ69OdfQ";
+
+        // Sensor enabled
+        String mode = "mode=driving";
+
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + mode + "&" + api_key;
+
+        // Output format
+        String output = "json";
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+
+        return url;
+    }
+
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+            urlConnection.connect();
+
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("Exception", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
     }
 
 
