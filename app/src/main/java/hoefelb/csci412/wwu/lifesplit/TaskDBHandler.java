@@ -37,13 +37,14 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_TASK_NUMBER_SPLITS = "task_number_splits";
     public static final String COLUMN_TASK_AVERAGE_TIME = "task_average_time";
     public static final String COLUMN_TASK_TIMES_RUN = "task_times_run";
+    public static final String COLUMN_PRESET_TASK_NUM = "task_preset_num";
 
     //TABLE_SPLITS columns (minus TASK_ID)
     public static final String COLUMN_SPLIT_ORDER_NUMBER = "split_order_number";
     public static final String COLUMN_SPLIT_NAME = "split_name";
     public static final String COLUMN_SPLIT_AVERAGE_TIME = "split_average_time";
     private SQLiteDatabase db = getWritableDatabase();
-    private int largestTaskID = 0;
+    private int largestTaskID;
 
     public TaskDBHandler(Context context, String name,
                        SQLiteDatabase.CursorFactory factory, int version) {
@@ -58,7 +59,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
                 "("+COLUMN_TASK_ID+" INTEGER PRIMARY KEY," + COLUMN_TASK_NAME+
                 " TEXT," + COLUMN_TASK_DESCRIPTION + " TEXT," + COLUMN_TASK_NUMBER_SPLITS +
                 " INTEGER," + COLUMN_TASK_AVERAGE_TIME +" LONG," + COLUMN_TASK_TIMES_RUN +
-                " INTEGER" + ")";
+                " INTEGER," + COLUMN_PRESET_TASK_NUM + " INTEGER" + ")";
         db.execSQL(CREATE_TASKS_TABLE);
 
         String CREATE_SPLITS_TABLE = "CREATE TABLE "+ TABLE_SPLITS +
@@ -77,6 +78,11 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
     public void addTask(SplitObject split,SQLiteDatabase db){
     //First, add the task
+        String taskSQLQuery = "Select max(task_id) from tasks";
+        Cursor d = db.rawQuery(taskSQLQuery,null);
+        if(d.moveToFirst())
+            largestTaskID = d.getInt(0) + 1;
+        this.largestTaskID = largestTaskID;
 
         ContentValues taskValues = new ContentValues();
         //REMEMBER TO CONSIDER DELETED TASKS FOR IDs
@@ -86,6 +92,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         taskValues.put(COLUMN_TASK_NUMBER_SPLITS,split.getNumSplits());
         taskValues.put(COLUMN_TASK_AVERAGE_TIME,0);
         taskValues.put(COLUMN_TASK_TIMES_RUN,0);
+        taskValues.put(COLUMN_PRESET_TASK_NUM,split.getPresetNum());
         db.insert(TABLE_TASKS,null,taskValues);
 
     //Next, add all the splits.
@@ -102,7 +109,22 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
         }
 
-        largestTaskID++;
+        this.largestTaskID++;
+
+
+    }
+
+    public void removeTask(SQLiteDatabase db, int i){
+        //first, check if it is a preset task
+        String taskSQLQuery = "Delete from " + TABLE_TASKS + " where " + COLUMN_TASK_ID + " = " + i +
+        " and " +COLUMN_PRESET_TASK_NUM + " = -1";
+        String where = COLUMN_TASK_ID + " = " + i +" and "+COLUMN_PRESET_TASK_NUM + " = -1";
+        int rowsDeleted = db.delete(TABLE_TASKS,where,null);
+        if(rowsDeleted == 1){
+        taskSQLQuery = "Delete from " + TABLE_SPLITS + " where " + COLUMN_TASK_ID + " = " + i +
+                " and " +COLUMN_PRESET_TASK_NUM + " = -1";
+        db.execSQL(taskSQLQuery);
+        }
 
 
     }
@@ -118,10 +140,11 @@ public class TaskDBHandler extends SQLiteOpenHelper {
             //there are tasks in sqlite. add them one at a time.
 
         //get max id for future inserts
-        taskSQLQuery = "Select max(" + COLUMN_TASK_ID + ") from " + TABLE_TASKS;
-        c = db.rawQuery(taskSQLQuery,null);
-        if(c.moveToFirst())
-            largestTaskID = c.getInt(0) + 1;
+        taskSQLQuery = "Select max(task_id) from tasks";
+        Cursor d = db.rawQuery(taskSQLQuery,null);
+        if(d.moveToFirst())
+            largestTaskID = d.getInt(0) + 1;
+        this.largestTaskID = largestTaskID;
     }
 
     private void createSplitObjectFromSQLite (Cursor c, SQLiteDatabase db){
@@ -131,11 +154,12 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         int task_number_splits = c.getInt(3);
         Long task_average_time = c.getLong(4);
         int task_times_run = c.getInt(5);
+        int task_preset_num = c.getInt(6);
 
         //get the split information from splits
         Editable[] task_descriptions = getTaskDescriptionsFromSQLite(task_id,task_number_splits, db);
-        TaskData.addTaskExisting(task_name,task_description,task_descriptions,task_average_time,task_times_run);
-
+        SplitObject  newSplitObject = TaskData.addTaskExisting(task_name,task_description,task_descriptions,task_average_time,task_times_run,task_preset_num);
+        newSplitObject.setID(task_id);
     }
 
     private Editable[] getTaskDescriptionsFromSQLite(int id,int numSplits, SQLiteDatabase db){
@@ -153,58 +177,59 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     }
 
     private void addPresetTasksToDB(SQLiteDatabase db){
-//        String title = "Morning Routine";
-//        String description = "Typical morning routine for a user";
-//        String morningSplits[] = new String[3];
-//        morningSplits[0] = "Shower";
-//        morningSplits[1] = "Eat breakfast";
-//        morningSplits[2] = "Morning commute";
-//        SplitObject preset = presetTask(title, description, morningSplits);
-//        generateButton(preset);
-//
-//        title = "Groceries";
-//        description = "Typical steps for buying groceries";
-//        String grocerySplits[] = new String[5];
-//        grocerySplits[0] = "Write list";
-//        grocerySplits[1] = "Drive to store";
-//        grocerySplits[2] = "Collect groceries";
-//        grocerySplits[3] = "Checkout";
-//        grocerySplits[4] = "Drive home";
-//        preset = presetTask(title, description, grocerySplits);
-//        generateButton(preset);
-//
-//        title = "Evening Routine";
-//        description = "Typical evening routine for a user";
-//        String eveningSplits[] = new String[3];
-//        eveningSplits[0] = "Shower";
-//        eveningSplits[1] = "Brush teeth";
-//        eveningSplits[2] = "Sleep";
-//        preset = presetTask(title, description, eveningSplits);
-//        generateButton(preset);
-//
-//        title = "Cook";
-//        description = "Typical steps needed to cook a meal";
-//        String cookSplits[] = new String[4];
-//        cookSplits[0] = "Prep ingredients";
-//        cookSplits[1] = "Cook ingredients";
-//        cookSplits[2] = "Plate food";
-//        cookSplits[3] = "Serve food";
-//        preset = presetTask(title, description, cookSplits);
-//        generateButton(preset);
-//
-//        title = "Idk man";
-//        description = "Someone come up with another of these";
-//        String thingSplits[] = new String[2];
-//        thingSplits[0] = "thing1";
-//        thingSplits[1] = "thing2";
-//        preset = presetTask(title, description, thingSplits);
-//        generateButton(preset);
-        Editable.Factory factory = Editable.Factory.getInstance();
+        String title = "Morning Routine";
+        String description = "Typical morning routine for a user";
+        String morningSplits[] = new String[3];
+        morningSplits[0] = "Shower";
+        morningSplits[1] = "Eat breakfast";
+        morningSplits[2] = "Morning commute";
+        SplitObject preset = presetTask(title, description, morningSplits,0);
+        addTask(preset,db);
+
+        title = "Groceries";
+        description = "Typical steps for buying groceries";
+        String grocerySplits[] = new String[5];
+        grocerySplits[0] = "Write list";
+        grocerySplits[1] = "Drive to store";
+        grocerySplits[2] = "Collect groceries";
+        grocerySplits[3] = "Checkout";
+        grocerySplits[4] = "Drive home";
+        preset = presetTask(title, description, morningSplits,1);
+        addTask(preset,db);
+
+        title = "Evening Routine";
+        description = "Typical evening routine for a user";
+        String eveningSplits[] = new String[3];
+        eveningSplits[0] = "Shower";
+        eveningSplits[1] = "Brush teeth";
+        eveningSplits[2] = "Sleep";
+        preset = presetTask(title, description, morningSplits,2);
+        addTask(preset,db);
+
+        title = "Cook";
+        description = "Typical steps needed to cook a meal";
+        String cookSplits[] = new String[4];
+        cookSplits[0] = "Prep ingredients";
+        cookSplits[1] = "Cook ingredients";
+        cookSplits[2] = "Plate food";
+        cookSplits[3] = "Serve food";
+        preset = presetTask(title, description, morningSplits,3);
+        addTask(preset,db);
+
+        title = "Idk man";
+        description = "Someone come up with another of these";
+        String thingSplits[] = new String[2];
+        thingSplits[0] = "thing1";
+        thingSplits[1] = "thing2";
+        preset = presetTask(title, description, morningSplits,4);
+        addTask(preset,db);
+        TaskData.removeAllTasks();
+
 
     }
 
 
-    SplitObject presetTask(String title, String description, String splitStrings[]) {
+    SplitObject presetTask(String title, String description, String splitStrings[],int presetID) {
         Editable.Factory factory = Editable.Factory.getInstance();
         Editable taskTitle = factory.newEditable(title);
         Editable taskDescription = factory.newEditable(description);
@@ -213,6 +238,6 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         for(int i = 0; i < numSplits; i++) {
             splitTitles[i] = factory.newEditable(splitStrings[i]);
         }
-        return TaskData.addTask(taskTitle, taskDescription, splitTitles);
+        return TaskData.addTask(taskTitle, taskDescription, splitTitles,presetID);
     }
 }

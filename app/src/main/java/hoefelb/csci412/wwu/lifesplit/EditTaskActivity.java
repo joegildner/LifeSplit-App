@@ -36,7 +36,7 @@ public class EditTaskActivity extends AppCompatActivity {
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
-        SplitObject splitObject = TaskData.getTask(splitObjectIndex);
+        final SplitObject splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
         Editable description = splitObject.getDescription();
         Editable[] splitNames = splitObject.getSplitNamesArray();
@@ -108,9 +108,10 @@ public class EditTaskActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //save data, return to previous screen
-                TaskData.removeTask(splitObjectIndex);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                returnIntent.putExtra("splitObjectID",TaskData.getTask(splitObjectIndex).getID());
+                TaskData.removeTask(splitObjectIndex);
                 setResult(Activity.RESULT_CANCELED, returnIntent);
                 EditTaskActivity.this.finish();
             }

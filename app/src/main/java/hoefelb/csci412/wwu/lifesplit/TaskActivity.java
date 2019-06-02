@@ -42,8 +42,7 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
-        //getApplicationContext().deleteDatabase("taskDB.db");
-        //System.out.println("YEET");
+        getApplicationContext().deleteDatabase("taskDB.db");
         //System.exit(0);
         this.handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
         this.handler.populateTaskData();
@@ -114,6 +113,8 @@ public class TaskActivity extends AppCompatActivity {
         //deleted task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
+            int splitObjectID = data.getIntExtra("splitObjectID",-1);
+            handler.removeTask(handler.getWritableDatabase(),splitObjectID);
             LinearLayout linearLayout = findViewById(R.id.linearLayout);
             linearLayout.removeView(linearLayout.getChildAt(splitObjectIndex));
             numButtons--;

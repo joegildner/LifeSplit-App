@@ -15,8 +15,9 @@ public class SplitObject {
     private Editable[] splitNames;
     private float[] splitTimes;
     private int presetNum;
+    private int ID;
 
-    public SplitObject(final Editable name, final Editable description, final Editable[] splitNames) {
+    public SplitObject(final Editable name, final Editable description, final Editable[] splitNames,final int presetNum) {
         this.name = name;
         this.description = description;
         this.splitNames = splitNames;
@@ -27,6 +28,7 @@ public class SplitObject {
         this.count = 0;
         this.avg = 0;
         this.presetNum = presetNum;
+        this.ID = -1;
     }
 
 //    public SplitObject(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
@@ -92,6 +94,10 @@ public class SplitObject {
     public void setSplitTime(final int index, long time){
         this.splitTimes[index] = time;
     }
+
+    public int getID(){return this.ID;}
+
+    public void setID(int ID){this.ID = ID;}
 
     public void runSplit() {
         this.count++;
