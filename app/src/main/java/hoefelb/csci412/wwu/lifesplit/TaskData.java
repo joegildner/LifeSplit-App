@@ -15,8 +15,8 @@ class TaskData {
     static void init(){
     }
 
-    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles) {
-        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles);
+    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles, final int taskNum) {
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles, taskNum);
 
         taskData.add(newSplitObject);
         return newSplitObject;
@@ -52,13 +52,5 @@ class TaskData {
 
     static void removeTask(int index) {
         taskData.remove(index);
-    }
-
-    static int getIndexSize(){
-        return taskData.size();
-    }
-
-    static void clearArrayList(){
-        taskData = new ArrayList<>();
     }
 }

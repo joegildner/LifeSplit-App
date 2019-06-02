@@ -14,35 +14,10 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class FirebaseLink {
-    static float[] taskAvg;
-    static int[] taskCount;
+    static float[] taskAvg = new float[5];
+    static int[] taskCount = new int[5];
 
-    //add complete object to firebase
-    public static void dbAdd(SplitObject newObject, int index) {
-        FirebaseDatabase db = FirebaseDatabase.getInstance();
-        String objname = "task" + (index);
-        DatabaseReference ref = db.getReference(objname + "/name");
-        ref.setValue( newObject.getName().toString());
-        ref = db.getReference(objname + "/description");
-        ref.setValue( newObject.getDescription().toString());
-        ref = db.getReference(objname + "/count");
-        ref.setValue( newObject.getCount());
-        ref = db.getReference(objname + "/avg");
-        ref.setValue( newObject.getAvg());
-
-        float[] splitTimes = newObject.getSplitTimesArray();
-        for(int i = 0; i < splitTimes.length; i++) {
-            ref = db.getReference(objname + "/splitTimes/splitTime" + i);
-            ref.setValue(splitTimes[i]);
-        }
-
-        Editable[] splitNames = newObject.getSplitNamesArray();
-        for(int i = 0; i < splitNames.length; i++) {
-            ref = db.getReference(objname + "/splitNames/splitName" + i);
-            ref.setValue(splitNames[i].toString());
-        }
-    }
-
+    //updates db at the end of a split
     public static void dbUpdate(final int index, final int time) {
         int count = taskCount[index] + 1;
         float newAvg = ((taskAvg[index] * (count-1)) + time) / count;
@@ -56,6 +31,14 @@ public class FirebaseLink {
         taskCount[index] = count;
     }
 
+    //pulls data for all tasks
+    public static void dbPullAll() {
+        for(int i = 0; i < 5; i++) {
+            dbPull(i);
+        }
+    }
+
+    //initiates a pull from db for a specific tasks
     public static void dbPull(final int index) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference ref = db.getReference(("task"+ index + "/avg"));
@@ -64,8 +47,8 @@ public class FirebaseLink {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                taskAvg[index] = Integer.valueOf(value);
+                Float value = dataSnapshot.getValue(Float.class);
+                taskAvg[index] = value;
             }
 
             @Override
@@ -80,8 +63,8 @@ public class FirebaseLink {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                taskCount[index] = Integer.valueOf(value);
+                int value = dataSnapshot.getValue(Integer.class);
+                taskCount[index] = value;
             }
 
             @Override
@@ -91,6 +74,7 @@ public class FirebaseLink {
         });
     }
 
+    //gets locally stored global avg value. Pull to update value
     public static float getGlobalAvg(int index) {
         return taskAvg[index];
     }

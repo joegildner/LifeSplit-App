@@ -90,6 +90,16 @@ public class TimingScreen extends AppCompatActivity {
         splitButton = (Button) findViewById(R.id.split_button);
         description = (TextView) findViewById(R.id.taskDescription);
 
+        TextView localAvg = findViewById(R.id.localAvg);
+        TextView globalAvg = findViewById(R.id.globalAvg);
+        localAvg.setText("Average: " + Float.toString(splitObject.getAvg()));
+        int preset = splitObject.getPresetNum();
+        if(preset != -1) {
+            globalAvg.setText("Global Average: " + Float.toString(FirebaseLink.getGlobalAvg(preset)));
+        } else {
+            globalAvg.setText("");
+        }
+
         handler = new Handler();
         timer.setText("--:--:--");
         description.setText(splitObject.getDescription());

@@ -33,6 +33,7 @@ public class TaskActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -52,6 +53,7 @@ public class TaskActivity extends AppCompatActivity {
             generateButton(TaskData.getTask(i));
         }
 
+        handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
 //        Editable[] e = new Editable[1];
 //        e[0] = Editable.Factory.getInstance().newEditable("Split 1");
         //handler.addTask(new SplitObject(Editable.Factory.getInstance().newEditable("Testtask"),Editable.Factory.getInstance().newEditable("TestTaskDesc"),e));
@@ -73,6 +75,7 @@ public class TaskActivity extends AppCompatActivity {
         });
 
         generatePresetTasks();
+        FirebaseLink.dbPullAll();
     }
 
     //executes when floating action button returns
@@ -172,7 +175,7 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     //generates a preset task based on the provided name and description
-    SplitObject presetTask(String title, String description, String splitStrings[]) {
+    SplitObject presetTask(final String title, final String description, final String splitStrings[], final int taskNum) {
         Editable.Factory factory = Editable.Factory.getInstance();
         Editable taskTitle = factory.newEditable(title);
         Editable taskDescription = factory.newEditable(description);
@@ -181,7 +184,7 @@ public class TaskActivity extends AppCompatActivity {
         for(int i = 0; i < numSplits; i++) {
             splitTitles[i] = factory.newEditable(splitStrings[i]);
         }
-        return TaskData.addTask(taskTitle, taskDescription, splitTitles);
+        return TaskData.addTask(taskTitle, taskDescription, splitTitles, taskNum);
     }
 
     //generates a button in the view for the provided SplitObject
@@ -194,6 +197,7 @@ public class TaskActivity extends AppCompatActivity {
 
         newButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                FirebaseLink.dbPullAll();
                 Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
                 LinearLayout parent =  (LinearLayout)view.getParent();
                 System.out.println(parent.indexOfChild(view));

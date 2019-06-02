@@ -14,6 +14,7 @@ public class SplitObject {
     private float avg;
     private Editable[] splitNames;
     private float[] splitTimes;
+    private int presetNum;
 
     public SplitObject(final Editable name, final Editable description, final Editable[] splitNames) {
         this.name = name;
@@ -25,6 +26,7 @@ public class SplitObject {
         }
         this.count = 0;
         this.avg = 0;
+        this.presetNum = presetNum;
     }
 
 //    public SplitObject(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
@@ -69,6 +71,10 @@ public class SplitObject {
 
     public float getAvg() {
         return this.avg;
+    }
+
+    public int getPresetNum() {
+        return this.presetNum;
     }
 
     public float getSplitTime(final int index) {

@@ -12,12 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.DataSnapshot;
-
 
 
 public class newTaskActivity extends AppCompatActivity {
@@ -84,8 +78,7 @@ public class newTaskActivity extends AppCompatActivity {
                     EditText currentText = (EditText)splitLayout.getChildAt(i);
                     splitTitles[i] = currentText.getText();
                 }
-                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles);
-                FirebaseLink.dbAdd(newSplitObject, TaskData.getIndex(newSplitObject));
+                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles, -1);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);
