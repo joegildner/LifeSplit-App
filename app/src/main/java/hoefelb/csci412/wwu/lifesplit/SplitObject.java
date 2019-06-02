@@ -27,6 +27,20 @@ public class SplitObject {
         this.avg = 0;
     }
 
+    public SplitObject(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
+        this.name = name;
+        this.description = description;
+        this.splitNames = splitNames;
+        this.splitTimes = new float[splitNames.length];
+        for(int i = 0; i < splitNames.length; i++) {
+            this.splitTimes[i] = 0;
+        }
+        this.count = timesRun;
+        this.avg = averageTime;
+
+
+    }
+
     public void editTask(final Editable name, final Editable description, final Editable[] splitNames) {
         this.name = name;
         this.description = description;

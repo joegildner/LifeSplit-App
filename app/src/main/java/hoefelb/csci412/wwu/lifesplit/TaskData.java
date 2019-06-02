@@ -22,6 +22,14 @@ class TaskData {
         return newSplitObject;
     }
 
+    static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
+        SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles,averageTime,timesRun);
+        taskData.add(newSplitObject);
+        return newSplitObject;
+
+    }
+
+
     static SplitObject editTask(final int index, final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles) {
 
         SplitObject current = getTask(index);

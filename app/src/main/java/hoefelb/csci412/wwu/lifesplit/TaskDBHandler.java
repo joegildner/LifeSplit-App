@@ -13,7 +13,10 @@ import android.content.Context;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.content.ContentResolver;
+import android.text.Editable;
+import android.text.SpannableStringBuilder;
 
+import com.google.android.gms.tasks.Task;
 
 
 public class TaskDBHandler extends SQLiteOpenHelper {
@@ -40,6 +43,7 @@ public class TaskDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_SPLIT_NAME = "split_name";
     public static final String COLUMN_SPLIT_AVERAGE_TIME = "split_average_time";
     private final SQLiteDatabase db;
+    private int largestTaskID;
 
     public TaskDBHandler(Context context, String name,
                        SQLiteDatabase.CursorFactory factory, int version) {
@@ -61,6 +65,9 @@ public class TaskDBHandler extends SQLiteOpenHelper {
                 "("+COLUMN_SPLIT_ORDER_NUMBER+" INTEGER," + COLUMN_TASK_ID +" INTEGER,"+ COLUMN_SPLIT_NAME+
                 " TEXT," + COLUMN_SPLIT_AVERAGE_TIME + " LONG" + ")";
         db.execSQL(CREATE_SPLITS_TABLE);
+
+        //Add the preset tasks
+        addPresetTasksToDB(db);
     }
 
     @Override
@@ -102,8 +109,52 @@ public class TaskDBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void populateTaskData(){
+    public void populateTaskData(SQLiteDatabase db){
+        String taskSQLQuery = "Select * from " + TABLE_TASKS;
+        Cursor c = db.rawQuery(taskSQLQuery,null);
+        if(c.moveToFirst()){
+            do
+                createSplitObjectFromSQLite(c,db);
+            while(c.moveToNext());
+            //there are tasks in sqlite. add them one at a time.
+        }
+
+
 
 
     }
+
+    private void createSplitObjectFromSQLite (Cursor c, SQLiteDatabase db){
+        int task_id = c.getInt(0);
+        Editable task_name = new SpannableStringBuilder(c.getString(1));
+        Editable task_description = new SpannableStringBuilder(c.getString(2));
+        int task_number_splits = c.getInt(3);
+        Long task_average_time = c.getLong(4);
+        int task_times_run = c.getInt(5);
+
+        //get the split information from splits
+        Editable[] task_descriptions = getTaskDescriptionsFromSQLite(task_id,task_number_splits, db);
+        TaskData.addTask(task_name,task_description,task_descriptions,task_average_time,task_times_run);
+
+    }
+
+    private Editable[] getTaskDescriptionsFromSQLite(int id,int numSplits, SQLiteDatabase db){
+        Editable[] returnArray = new Editable[numSplits];
+        int returnArrayPos = 0;
+        String taskSQLQuery = "Select * from " + TABLE_SPLITS +
+                                " Where task_id = \"" + id+"\"";
+        Cursor d = db.rawQuery(taskSQLQuery,null);
+        do{
+            if(d.moveToFirst()){
+                returnArray[returnArrayPos] = new SpannableStringBuilder(d.getString(2));
+            }
+        }
+        while(d.moveToNext());
+        return returnArray;
+    }
+
+    private void addPresetTasksToDB(SQLiteDatabase db){
+
+    }
+
 }
