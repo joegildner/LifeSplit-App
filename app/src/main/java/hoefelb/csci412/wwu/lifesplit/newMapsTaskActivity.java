@@ -27,6 +27,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -187,6 +188,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         saveButton.setOnClickListener(saveData);
         aButton.setBackgroundColor(Color.parseColor("#FF6666"));
         bButton.setBackgroundColor(Color.parseColor("#00BFFF"));
+        saveButton.setBackgroundColor(Color.parseColor("#D3D3D3"));
         driving.setBackgroundColor(Color.parseColor("#00BFFF"));
         walking.setBackgroundColor(Color.WHITE);
 
@@ -409,8 +411,8 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
                 newMapsTaskActivity.this.finish();
 
             }else{
-                Toast toast=Toast.makeText(getApplicationContext(),"Set both markers before saving.",Toast.LENGTH_SHORT);
-                toast.setMargin(50,50);
+                Toast toast=Toast.makeText(getBaseContext(),"Set both markers before saving.",Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0,20);
                 toast.show();
             }
 

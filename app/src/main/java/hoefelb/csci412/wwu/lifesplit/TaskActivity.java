@@ -49,13 +49,16 @@ public class TaskActivity extends AppCompatActivity {
         //Add all the buttons
         int taskDataSize = TaskData.getIndexSize();
 
-        for(int i = 0; i < taskDataSize; i++){
+        System.out.println("THERE ARE THIS MANY TASKS "+taskDataSize);
+
+
+        for (int i = 0; i < taskDataSize; i++) {
 
             SplitObject thisObject = TaskData.getTask(i);
 
-            if(thisObject.getDescription().toString().equals(getResources().getString(R.string.map_activity_hash))){
+            if (thisObject.getDescription().toString().equals(getResources().getString(R.string.map_activity_hash))) {
                 generateMapButton(thisObject);
-            }else{
+            } else {
                 generateButton(thisObject);
             }
         }
@@ -88,19 +91,19 @@ public class TaskActivity extends AppCompatActivity {
         //created task return
         if (requestCode == CREATE && resultCode == Activity.RESULT_OK) {
 
-                //create new button
-                final int index = data.getIntExtra("splitObjectIndex", -1);
-                if (index != -1) {
-                    System.out.println(index);
-                    System.out.println(TaskData.getTask(index).getName());
-                }
-                final SplitObject newSplitObject = TaskData.getTask(index);
-                handler.addTask(newSplitObject,handler.getWritableDatabase());
-                generateButton(newSplitObject);
+            //create new button
+            final int index = data.getIntExtra("splitObjectIndex", -1);
+            if (index != -1) {
+                System.out.println(index);
+                System.out.println(TaskData.getTask(index).getName());
+            }
+            final SplitObject newSplitObject = TaskData.getTask(index);
+            handler.addTask(newSplitObject, handler.getWritableDatabase());
+            generateButton(newSplitObject);
 
 
-        //timing screen return
-        }else if (requestCode == CREATE_MAP && resultCode == Activity.RESULT_OK) {
+            //timing screen return
+        } else if (requestCode == CREATE_MAP && resultCode == Activity.RESULT_OK) {
 
             //create new button
             final int index = data.getIntExtra("splitObjectIndex", -1);
@@ -109,30 +112,30 @@ public class TaskActivity extends AppCompatActivity {
                 System.out.println(TaskData.getTask(index).getName());
             }
             final SplitObject newSplitObject = TaskData.getTask(index);
-            handler.addTask(newSplitObject,handler.getWritableDatabase());
+            handler.addTask(newSplitObject, handler.getWritableDatabase());
             generateMapButton(newSplitObject);
 
 
             //timing screen return
-        }else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
             Long taskTime = data.getLongExtra("totalTimeLong", -1);
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             //store the result data from the timing screen
             //make a call to the split object for the index to recalculate the average time
 
-        //edited task return
+            //edited task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_OK) {
             int extras = data.getIntExtra("splitObjectIndex", -1);
             final SplitObject newSplitObject = TaskData.getTask(extras);
             LinearLayout linearLayout = findViewById(R.id.linearLayout);
-            Button curButton = (Button)linearLayout.getChildAt(extras);
+            Button curButton = (Button) linearLayout.getChildAt(extras);
             curButton.setText(newSplitObject.getName());
 
-        //deleted task return
+            //deleted task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
-            int splitObjectID = data.getIntExtra("splitObjectID",-1);
-            handler.removeTask(handler.getWritableDatabase(),splitObjectID);
+            int splitObjectID = data.getIntExtra("splitObjectID", -1);
+            handler.removeTask(handler.getWritableDatabase(), splitObjectID);
             LinearLayout linearLayout = findViewById(R.id.linearLayout);
             linearLayout.removeView(linearLayout.getChildAt(splitObjectIndex));
             numButtons--;
@@ -147,7 +150,7 @@ public class TaskActivity extends AppCompatActivity {
         Editable taskDescription = factory.newEditable(description);
         int numSplits = splitStrings.length;
         Editable[] splitTitles = new Editable[numSplits];
-        for(int i = 0; i < numSplits; i++) {
+        for (int i = 0; i < numSplits; i++) {
             splitTitles[i] = factory.newEditable(splitStrings[i]);
         }
         return TaskData.addTask(taskTitle, taskDescription, splitTitles, taskNum);
@@ -158,14 +161,14 @@ public class TaskActivity extends AppCompatActivity {
         final Button newButton = new Button(TaskActivity.this);
         newButton.setText(newObject.getName());
         final LinearLayout linearLayout = findViewById(R.id.linearLayout);
-        linearLayout.addView(newButton,numButtons);
+        linearLayout.addView(newButton, numButtons);
 
 
         newButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 FirebaseLink.dbPullAll();
                 Intent taskIntent = new Intent(TaskActivity.this, TimingScreen.class);
-                LinearLayout parent =  (LinearLayout)view.getParent();
+                LinearLayout parent = (LinearLayout) view.getParent();
                 System.out.println(parent.indexOfChild(view));
                 taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
                 startActivityForResult(taskIntent, TIMING);
@@ -186,14 +189,14 @@ public class TaskActivity extends AppCompatActivity {
         final Button newButton = new Button(TaskActivity.this);
         newButton.setText(newObject.getName());
         final LinearLayout linearLayout = findViewById(R.id.linearLayout);
-        linearLayout.addView(newButton,numButtons);
+        linearLayout.addView(newButton, numButtons);
 
 
         newButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 //FirebaseLink.dbPullAll();
                 Intent taskIntent = new Intent(TaskActivity.this, mapsTimingScreen.class);
-                LinearLayout parent =  (LinearLayout)view.getParent();
+                LinearLayout parent = (LinearLayout) view.getParent();
                 System.out.println(parent.indexOfChild(view));
                 taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
                 startActivityForResult(taskIntent, TIMING);

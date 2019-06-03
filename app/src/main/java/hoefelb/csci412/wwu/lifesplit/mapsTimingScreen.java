@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -27,7 +26,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,11 +52,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -149,7 +145,22 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         }
 
         // Add a marker in Sydney and move the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(startingLocation));
+
+        MarkerOptions markerOptions = new MarkerOptions().position(aLatLng);
+        aMarker = mMap.addMarker(markerOptions);
+        MarkerOptions bOptions = new MarkerOptions().position(bLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        bMarker = mMap.addMarker(bOptions);
+
+        LatLngBounds mapBounds = new LatLngBounds(aLatLng, bLatLng);
+        mMap.setLatLngBoundsForCameraTarget(mapBounds);
+
+        if(aLatLng != null && bLatLng != null){
+            String url = getDirectionsUrl(aLatLng, bLatLng);
+
+            DownloadTask downloadTask = new DownloadTask();
+
+            downloadTask.execute(url);
+        }
     }
 
     @Override
@@ -172,17 +183,13 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         aLatLng = new LatLng(Double.parseDouble(splitNames[0].toString()),Double.parseDouble(splitNames[1].toString()));
-        MarkerOptions markerOptions = new MarkerOptions().position(aLatLng);
-        aMarker = mMap.addMarker(markerOptions);
 
         bLatLng = new LatLng(Double.parseDouble(splitNames[2].toString()),Double.parseDouble(splitNames[3].toString()));
-        MarkerOptions bOptions = new MarkerOptions().position(bLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        bMarker = mMap.addMarker(bOptions);
 
         method = splitNames[4].toString();
 
-        LatLngBounds mapBounds = new LatLngBounds(aLatLng, bLatLng);
-        mMap.setLatLngBoundsForCameraTarget(mapBounds);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.mapTitle);
+        toolbar.setTitle(splitObject.getName());
 
         Button startButton = (Button) findViewById(R.id.mapSplit);
         Button pauseButton = (Button) findViewById(R.id.mapPause);
@@ -264,24 +271,6 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         }
     };
 
-    private View.OnClickListener saveData = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if(aLatLng != null && bLatLng !=null) {
-                SharedPreferences prefs = getSharedPreferences("CommuteSplits", MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-
-            }else{
-                Toast toast=Toast.makeText(getApplicationContext(),"Set both markers before saving.",Toast.LENGTH_SHORT);
-                toast.setMargin(50,50);
-                toast.show();
-            }
-
-
-
-
-        }
-    };
 
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
