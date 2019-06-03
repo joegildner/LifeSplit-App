@@ -28,6 +28,7 @@ public class TaskActivity extends AppCompatActivity {
     final int CREATE = 0;
     final int TIMING = 1;
     final int EDIT = 2;
+    final int CREATE_MAP = 3;
 
     private TaskDBHandler handler;
 
@@ -47,8 +48,16 @@ public class TaskActivity extends AppCompatActivity {
         this.handler.populateTaskData();
         //Add all the buttons
         int taskDataSize = TaskData.getIndexSize();
+
         for(int i = 0; i < taskDataSize; i++){
-            generateButton(TaskData.getTask(i));
+
+            SplitObject thisObject = TaskData.getTask(i);
+
+            if(thisObject.getDescription().toString().equals(getResources().getString(R.string.map_activity_hash))){
+                generateMapButton(thisObject);
+            }else{
+                generateButton(thisObject);
+            }
         }
 
         handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
@@ -65,7 +74,7 @@ public class TaskActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newMapsTaskActivity.class);
                 //newTaskIntent.putExtra("index", numButtons);
-                startActivityForResult(newTaskIntent, 0);
+                startActivityForResult(newTaskIntent, CREATE_MAP);
             }
         });
 
@@ -91,7 +100,21 @@ public class TaskActivity extends AppCompatActivity {
 
 
         //timing screen return
-        } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
+        }else if (requestCode == CREATE_MAP && resultCode == Activity.RESULT_OK) {
+
+            //create new button
+            final int index = data.getIntExtra("splitObjectIndex", -1);
+            if (index != -1) {
+                System.out.println(index);
+                System.out.println(TaskData.getTask(index).getName());
+            }
+            final SplitObject newSplitObject = TaskData.getTask(index);
+            handler.addTask(newSplitObject,handler.getWritableDatabase());
+            generateMapButton(newSplitObject);
+
+
+            //timing screen return
+        }else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
             Long taskTime = data.getLongExtra("totalTimeLong", -1);
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             //store the result data from the timing screen
@@ -153,6 +176,31 @@ public class TaskActivity extends AppCompatActivity {
                 Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
                 taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
                 startActivityForResult(taskIntent, EDIT);
+                return true;
+            }
+        });
+        numButtons++;
+    }
+
+    void generateMapButton(final SplitObject newObject) {
+        final Button newButton = new Button(TaskActivity.this);
+        newButton.setText(newObject.getName());
+        final LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        linearLayout.addView(newButton,numButtons);
+
+
+        newButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                //FirebaseLink.dbPullAll();
+                Intent taskIntent = new Intent(TaskActivity.this, mapsTimingScreen.class);
+                LinearLayout parent =  (LinearLayout)view.getParent();
+                System.out.println(parent.indexOfChild(view));
+                taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
+                startActivityForResult(taskIntent, TIMING);
+            }
+        });
+        newButton.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View view) {
                 return true;
             }
         });

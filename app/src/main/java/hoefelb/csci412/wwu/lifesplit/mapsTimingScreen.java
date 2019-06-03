@@ -5,7 +5,6 @@ package hoefelb.csci412.wwu.lifesplit;
 //Current location
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,15 +16,13 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,12 +41,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONObject;
 
@@ -57,19 +54,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyCallback {
+public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCallback {
     private int numOfSplits = 1;
     private final int PERMISSION_ACCESS_LOCATION = 4;
     private boolean locationEnabled = false;
     // private Fragment addNewTaskFragment;
 
     private GoogleMap mMap;
+    private int splitObjectIndex;
 
     private float stdZoom = 15.0f;
 
@@ -87,15 +87,10 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
     private LatLng startingLocation;
 
-    private EditText titleText;
-    private Button aButton;
-    private Button bButton;
-    private Button saveButton;
-    private ImageButton driving;
-    private ImageButton walking;
-    private Drawable unselect;
-    private Drawable select;
-    private String method = "driving";
+    private Button startButton;
+    private Button pauseButton;
+    private TextView currTime;
+    private TextView avgTime;
 
     private boolean aSet = false;
     private boolean bSet = false;
@@ -105,6 +100,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
     private Marker bMarker;
     private LatLng bLatLng;
     private Polyline directions;
+    private String method;
 
     private TextView infoText;
     private String defText;
@@ -133,10 +129,6 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_ACCESS_LOCATION);
 
-            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
-
         } else {
             locationEnabled = true;
         }
@@ -162,183 +154,69 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Intent context = getIntent();
+        splitObjectIndex = context.getIntExtra("splitObjectIndex",-1);
+        if (splitObjectIndex == -1){
+            System.out.println("ERROR - ID not found");
+        }
+        final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        Editable title = splitObject.getName();
+        Editable[] splitNames = splitObject.getSplitNamesArray();
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_maps_task);
+        setContentView(R.layout.activity_maps_timing_screen);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.mapTiming);
         mapFragment.getMapAsync(this);
 
+        aLatLng = new LatLng(Double.parseDouble(splitNames[0].toString()),Double.parseDouble(splitNames[1].toString()));
+        MarkerOptions markerOptions = new MarkerOptions().position(aLatLng);
+        aMarker = mMap.addMarker(markerOptions);
 
-        Button search = (Button) findViewById(R.id.searchMap);
-        aButton = (Button) findViewById(R.id.setA);
-        bButton = (Button) findViewById(R.id.setB);
-        saveButton = (Button) findViewById(R.id.save);
-        driving = (ImageButton) findViewById(R.id.driving);
-        walking = (ImageButton) findViewById(R.id.walking);
+        bLatLng = new LatLng(Double.parseDouble(splitNames[2].toString()),Double.parseDouble(splitNames[3].toString()));
+        MarkerOptions bOptions = new MarkerOptions().position(bLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        bMarker = mMap.addMarker(bOptions);
 
-        infoText = (TextView)findViewById(R.id.infoText);
-        defText = (String)infoText.getText();
+        method = splitNames[4].toString();
 
-        titleText = (EditText) findViewById(R.id.titleText);
-        search.setOnClickListener(mapSearch);
-        aButton.setOnClickListener(setA);
-        bButton.setOnClickListener(setB);
-        saveButton.setOnClickListener(saveData);
-        aButton.setBackgroundColor(Color.parseColor("#FF6666"));
-        bButton.setBackgroundColor(Color.parseColor("#00BFFF"));
-        driving.setBackgroundColor(Color.parseColor("#00BFFF"));
-        walking.setBackgroundColor(Color.WHITE);
+        LatLngBounds mapBounds = new LatLngBounds(aLatLng, bLatLng);
+        mMap.setLatLngBoundsForCameraTarget(mapBounds);
 
+        Button startButton = (Button) findViewById(R.id.mapSplit);
+        Button pauseButton = (Button) findViewById(R.id.mapPause);
+        TextView currTime = (TextView) findViewById(R.id.currTime);
+        TextView avgTime = (TextView) findViewById(R.id.avgTime);
 
-        select = driving.getBackground();
-        unselect = walking.getBackground();
-
-        driving.setOnClickListener(modeDriving);
-        walking.setOnClickListener(modeWalking);
+        startButton.setOnClickListener(startTimer);
 
 
     }
 
-    private View.OnClickListener modeDriving = new View.OnClickListener() {
+    private View.OnClickListener startTimer = new View.OnClickListener() {
         public void onClick(View v) {
-            String prevMethod = method;
-            method = "driving";
-            driving.setBackgroundColor(Color.parseColor("#00BFFF"));
-            walking.setBackgroundColor(Color.WHITE);
-
-            if(!prevMethod.equals(method)){
-                if(aLatLng != null && bLatLng != null){
-                    String url = getDirectionsUrl(aLatLng, bLatLng);
-
-                    DownloadTask downloadTask = new DownloadTask();
-
-                    downloadTask.execute(url);
-                    directions.remove();
-                }
-            }
+            startButton.setTextColor(Color.LTGRAY);
+            startButton.setOnClickListener(null);
         }
     };
 
-    private View.OnClickListener modeWalking = new View.OnClickListener() {
+    private View.OnClickListener pauseTimer = new View.OnClickListener() {
         public void onClick(View v) {
-            String prevMethod = method;
-            method = "walking";
-            walking.setBackgroundColor(Color.parseColor("#00BFFF"));
-            driving.setBackgroundColor(Color.WHITE);
-
-            if(!prevMethod.equals(method)){
-                if(aLatLng != null && bLatLng != null){
-                    String url = getDirectionsUrl(aLatLng, bLatLng);
-
-                    DownloadTask downloadTask = new DownloadTask();
-
-                    downloadTask.execute(url);
-                    directions.remove();
-                }
-            }
+            pauseButton.setText("Reset");
+            startButton.setText("Resume");
+            startButton.setTextColor(Color.BLACK);
+            pauseButton.setOnClickListener(resetTimer);
+            startButton.setOnClickListener(startTimer);
         }
     };
 
-    private View.OnClickListener setA = new View.OnClickListener() {
+    private View.OnClickListener resetTimer = new View.OnClickListener() {
         public void onClick(View v) {
-            mMap.setOnMapClickListener(setAMarker);
-            bButton.setOnClickListener(null);
-            aButton.setOnClickListener(null);
-            infoText.setText("Tap map to set marker.");
 
         }
     };
 
-    private GoogleMap.OnMapClickListener setAMarker = new GoogleMap.OnMapClickListener() {
-        @Override
-        public void onMapClick(LatLng point) {
-            MarkerOptions markerOptions = new MarkerOptions().position(point);
-            aMarker = mMap.addMarker(markerOptions);
-            aLatLng = point;
-
-            aButton.setText("Reset A");
-            aButton.setOnClickListener(resetA);
-            mMap.setOnMapClickListener(null);
-            aSet = true;
-            infoText.setText(defText);
-
-            if(bSet) bButton.setOnClickListener(resetB);
-            else bButton.setOnClickListener(setB);
-
-            if(aLatLng != null && bLatLng != null){
-                String url = getDirectionsUrl(aLatLng, bLatLng);
-
-                DownloadTask downloadTask = new DownloadTask();
-
-                downloadTask.execute(url);
-            }
-
-        }
-    };
-
-    private View.OnClickListener resetA = new View.OnClickListener() {
-        public void onClick(View v) {
-            aButton.setText("Set A");
-            aButton.setOnClickListener(setA);
-            aMarker.remove();
-            directions.remove();
-            aMarker = null;
-            aLatLng = null;
-            aSet = false;
-
-        }
-    };
-
-    private View.OnClickListener setB = new View.OnClickListener() {
-        public void onClick(View v) {
-            mMap.setOnMapClickListener(setBMarker);
-            bButton.setOnClickListener(null);
-            aButton.setOnClickListener(null);
-            infoText.setText("Tap map to set marker.");
-        }
-    };
-
-    private GoogleMap.OnMapClickListener setBMarker = new GoogleMap.OnMapClickListener() {
-        @Override
-        public void onMapClick(LatLng point) {
-            MarkerOptions markerOptions = new MarkerOptions().position(point).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-            bMarker = mMap.addMarker(markerOptions);
-            bLatLng = point;
-
-
-            bButton.setText("Reset B");
-            bButton.setOnClickListener(resetB);
-            mMap.setOnMapClickListener(null);
-            bSet = true;
-            infoText.setText(defText);
-
-            if(aSet) aButton.setOnClickListener(resetA);
-            else aButton.setOnClickListener(setA);
-
-            if(aLatLng != null && bLatLng != null){
-                String url = getDirectionsUrl(aLatLng, bLatLng);
-                System.out.println(url);
-                DownloadTask downloadTask = new DownloadTask();
-
-                downloadTask.execute(url);
-            }
-        }
-    };
-
-    private View.OnClickListener resetB = new View.OnClickListener() {
-        public void onClick(View v) {
-            bButton.setText("Set B");
-            bButton.setOnClickListener(setB);
-            bMarker.remove();
-            directions.remove();
-            bMarker = null;
-            bLatLng = null;
-
-            bSet = false;
-
-        }
-    };
 
     private OnSuccessListener<Location> locationSuccess = new OnSuccessListener<Location>() {
         @Override
@@ -390,23 +268,8 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         @Override
         public void onClick(View v) {
             if(aLatLng != null && bLatLng !=null) {
-                Editable taskTitle = titleText.getText();
-                Editable taskDescription = new SpannableStringBuilder(getResources().getString(R.string.map_activity_hash));
-
-                Editable[] splitTitles = new Editable[5];
-
-                splitTitles[0] = new SpannableStringBuilder(Double.toString(aLatLng.latitude));
-                splitTitles[1] = new SpannableStringBuilder(Double.toString(aLatLng.longitude));
-                splitTitles[2] = new SpannableStringBuilder(Double.toString(bLatLng.latitude));
-                splitTitles[3] = new SpannableStringBuilder(Double.toString(bLatLng.longitude));
-                splitTitles[4] = new SpannableStringBuilder(method);
-
-
-                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles, -1);
-                Intent returnIntent = getIntent();
-                returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
-                setResult(Activity.RESULT_OK, returnIntent);
-                newMapsTaskActivity.this.finish();
+                SharedPreferences prefs = getSharedPreferences("CommuteSplits", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
 
             }else{
                 Toast toast=Toast.makeText(getApplicationContext(),"Set both markers before saving.",Toast.LENGTH_SHORT);
