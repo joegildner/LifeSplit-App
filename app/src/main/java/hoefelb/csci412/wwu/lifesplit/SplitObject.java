@@ -17,7 +17,7 @@ public class SplitObject {
     private int presetNum;
     private int ID;
 
-    public SplitObject(final Editable name, final Editable description, final Editable[] splitNames,final int presetNum) {
+    SplitObject(final Editable name, final Editable description, final Editable[] splitNames,final int presetNum) {
         this.name = name;
         this.description = description;
         this.splitNames = splitNames;
@@ -31,19 +31,7 @@ public class SplitObject {
         this.ID = -1;
     }
 
-//    public SplitObject(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles,Long averageTime,int timesRun){
-//        this.name = name;
-//        this.description = description;
-//        this.splitNames = splitNames;
-//        this.splitTimes = new float[splitNames.length];
-//        for(int i = 0; i < splitNames.length; i++) {
-//            this.splitTimes[i] = 0;
-//        }
-//        this.count = timesRun;
-//        this.avg = averageTime;
-//    }
-
-    public void editTask(final Editable name, final Editable description, final Editable[] splitNames) {
+    void editTask(final Editable name, final Editable description, final Editable[] splitNames) {
         this.name = name;
         this.description = description;
         this.splitNames = splitNames;
@@ -53,15 +41,15 @@ public class SplitObject {
         return this.name;
     }
 
-    public Editable getDescription() {
+    Editable getDescription() {
         return this.description;
     }
 
-    public Editable[] getSplitNamesArray(){return this.splitNames;}
+    Editable[] getSplitNamesArray(){return this.splitNames;}
 
     public float[] getSplitTimesArray(){return this.splitTimes;}
 
-    public Editable getSplitName(final int index) {
+    Editable getSplitName(final int index) {
         return this.splitNames[index];
     }
 
@@ -69,13 +57,13 @@ public class SplitObject {
         return this.count;
     }
 
-    public int getNumSplits(){return this.splitNames.length;}
+    int getNumSplits(){return this.splitNames.length;}
 
-    public float getAvg() {
+    float getAvg() {
         return this.avg;
     }
 
-    public int getPresetNum() {
+    int getPresetNum() {
         return this.presetNum;
     }
 
@@ -83,21 +71,21 @@ public class SplitObject {
         return this.splitTimes[index];
     }
 
-    public void setAverageTime(Float avg){
+    void setAverageTime(final Float avg){
         this.avg = avg;
     }
 
-    public void setTimesRun(int count){
+    void setTimesRun(final int count){
         this.count = count;
     }
 
-    public void setSplitTime(final int index, long time){
+    void setSplitTime(final int index, long time){
         this.splitTimes[index] = time;
     }
 
-    public int getID(){return this.ID;}
+    int getID(){return this.ID;}
 
-    public void setID(int ID){this.ID = ID;}
+    void setID(final int ID){this.ID = ID;}
 
     public void runSplit() {
         this.count++;

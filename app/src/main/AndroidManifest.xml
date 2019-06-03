@@ -25,7 +25,7 @@
         </activity>
         <activity
             android:name=".TaskActivity"
-            android:label="@string/title_activity_task"
+            android:label="LifeSplit"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".TimingScreen"

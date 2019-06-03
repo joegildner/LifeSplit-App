@@ -9,25 +9,19 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -234,12 +228,12 @@ public class TimingScreen extends AppCompatActivity {
     public class SplitAdapter extends RecyclerView.Adapter<SplitAdapter.ViewHolder> {
 
 
-        public class ViewHolder extends RecyclerView.ViewHolder{
+        class ViewHolder extends RecyclerView.ViewHolder{
 
-            public TextView splitNameView;
-            public TextView splitTiming;
+            TextView splitNameView;
+            TextView splitTiming;
 
-            public ViewHolder(View itemView){
+            ViewHolder(View itemView){
                 super(itemView);
 
                 splitNameView = (TextView) itemView.findViewById(R.id.split_name);
@@ -252,7 +246,7 @@ public class TimingScreen extends AppCompatActivity {
 
         private List<Editable> mSplitNames;
 
-        public SplitAdapter(List<Editable> splitNames){
+        SplitAdapter(List<Editable> splitNames){
             mSplitNames = splitNames;
         }
 

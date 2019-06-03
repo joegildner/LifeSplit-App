@@ -43,7 +43,6 @@ public class TaskActivity extends AppCompatActivity {
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
         getApplicationContext().deleteDatabase("taskDB.db");
-        //System.exit(0);
         this.handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
         this.handler.populateTaskData();
         //Add all the buttons
@@ -53,9 +52,6 @@ public class TaskActivity extends AppCompatActivity {
         }
 
         handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
-//        Editable[] e = new Editable[1];
-//        e[0] = Editable.Factory.getInstance().newEditable("Split 1");
-        //handler.addTask(new SplitObject(Editable.Factory.getInstance().newEditable("Testtask"),Editable.Factory.getInstance().newEditable("TestTaskDesc"),e));
         addButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newTaskActivity.class);
@@ -73,7 +69,6 @@ public class TaskActivity extends AppCompatActivity {
             }
         });
 
-        generatePresetTasks();
         FirebaseLink.dbPullAll();
     }
 
@@ -122,59 +117,6 @@ public class TaskActivity extends AppCompatActivity {
 
     }
 
-    //generates the preset tasks
-    void generatePresetTasks() {
-        //Done in TaskDBHandler.java
-
-
-//        String title = "Morning Routine";
-//        String description = "Typical morning routine for a user";
-//        String morningSplits[] = new String[3];
-//        morningSplits[0] = "Shower";
-//        morningSplits[1] = "Eat breakfast";
-//        morningSplits[2] = "Morning commute";
-//        SplitObject preset = presetTask(title, description, morningSplits);
-//        generateButton(preset);
-//
-//        title = "Groceries";
-//        description = "Typical steps for buying groceries";
-//        String grocerySplits[] = new String[5];
-//        grocerySplits[0] = "Write list";
-//        grocerySplits[1] = "Drive to store";
-//        grocerySplits[2] = "Collect groceries";
-//        grocerySplits[3] = "Checkout";
-//        grocerySplits[4] = "Drive home";
-//        preset = presetTask(title, description, grocerySplits);
-//        generateButton(preset);
-//
-//        title = "Evening Routine";
-//        description = "Typical evening routine for a user";
-//        String eveningSplits[] = new String[3];
-//        eveningSplits[0] = "Shower";
-//        eveningSplits[1] = "Brush teeth";
-//        eveningSplits[2] = "Sleep";
-//        preset = presetTask(title, description, eveningSplits);
-//        generateButton(preset);
-//
-//        title = "Cook";
-//        description = "Typical steps needed to cook a meal";
-//        String cookSplits[] = new String[4];
-//        cookSplits[0] = "Prep ingredients";
-//        cookSplits[1] = "Cook ingredients";
-//        cookSplits[2] = "Plate food";
-//        cookSplits[3] = "Serve food";
-//        preset = presetTask(title, description, cookSplits);
-//        generateButton(preset);
-//
-//        title = "Idk man";
-//        description = "Someone come up with another of these";
-//        String thingSplits[] = new String[2];
-//        thingSplits[0] = "thing1";
-//        thingSplits[1] = "thing2";
-//        preset = presetTask(title, description, thingSplits);
-//        generateButton(preset);
-    }
-
     //generates a preset task based on the provided name and description
     SplitObject presetTask(final String title, final String description, final String splitStrings[], final int taskNum) {
         Editable.Factory factory = Editable.Factory.getInstance();
@@ -189,7 +131,7 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     //generates a button in the view for the provided SplitObject
-    void generateButton(SplitObject newObject) {
+    void generateButton(final SplitObject newObject) {
         final Button newButton = new Button(TaskActivity.this);
         newButton.setText(newObject.getName());
         final LinearLayout linearLayout = findViewById(R.id.linearLayout);
