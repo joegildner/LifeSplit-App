@@ -16,10 +16,6 @@ class TaskData {
     }
 
     static SplitObject addTask(final Editable taskTitle, final Editable taskDescription, final Editable[] splitTitles, final int taskNum) {
-        for(int i = 0; i < splitTitles.length; i++) {
-            System.out.println(i);
-        }
-
         SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles, taskNum);
 
         taskData.add(newSplitObject);
@@ -30,12 +26,11 @@ class TaskData {
         SplitObject newSplitObject = new SplitObject(taskTitle, taskDescription, splitTitles,presetNum);
         for(int i = 0; i < splitTitles.length; i++) {
             newSplitObject.setSplitTime(i,0);
-       }
-       newSplitObject.setAverageTime(averageTime.floatValue());
+        }
+        newSplitObject.setAverageTime(averageTime.floatValue());
         newSplitObject.setTimesRun(timesRun);
         taskData.add(newSplitObject);
         return newSplitObject;
-
     }
 
 
