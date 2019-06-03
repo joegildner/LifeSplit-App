@@ -89,7 +89,7 @@ public class TimingScreen extends AppCompatActivity {
         localAvg.setText("Average: " + toTimeFormat((long)splitObject.getAvg()));
         int preset = splitObject.getPresetNum();
         if(preset != -1) {
-            globalAvg.setText("Global Average: " + Float.toString(FirebaseLink.getGlobalAvg(preset)));
+            globalAvg.setText("Global Average: " + toTimeFormat((long)FirebaseLink.getGlobalAvg(preset)));
         } else {
             globalAvg.setText("");
         }
@@ -156,6 +156,7 @@ public class TimingScreen extends AppCompatActivity {
                     final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
                     splitObject.runSplit();
                     splitObject.calcAvg(totalTime);
+                    FirebaseLink.dbUpdate(splitObject.getPresetNum(), totalTime);
 
                 }
                 //CHECK FOR LAST SPLIT

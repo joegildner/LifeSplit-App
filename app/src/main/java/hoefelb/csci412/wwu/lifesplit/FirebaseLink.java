@@ -15,15 +15,18 @@ public class FirebaseLink {
     private static int[] taskCount = new int[5];
 
     //updates db at the end of a split
-    public static void dbUpdate(final int index, final int time) {
+    public static void dbUpdate(final int index, final float time) {
+        if(index == -1) {
+            return;
+        }
         int count = taskCount[index] + 1;
         float newAvg = ((taskAvg[index] * (count-1)) + time) / count;
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         String objname = "task" + (index);
         DatabaseReference ref = db.getReference(objname + "/avg");
-        ref.setValue(Float.toString(newAvg));
+        ref.setValue(newAvg);
         ref = db.getReference(objname + "/count");
-        ref.setValue(Integer.toString(count));
+        ref.setValue(count);
         taskAvg[index] = newAvg;
         taskCount[index] = count;
     }
