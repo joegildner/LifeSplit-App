@@ -91,12 +91,8 @@ public class SplitObject {
         this.count++;
     }
 
-    public float calcAvg() {
-        float total = 0;
-        for (float splitTime : splitTimes) {
-            total += splitTime;
-        }
-        this.avg = total/this.count;
-        return this.avg;
+    public void calcAvg(float newTime) {
+        float newAvg = (this.avg*(this.count -1)) + newTime;
+        this.avg = newAvg/this.count;
     }
 }

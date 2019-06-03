@@ -63,7 +63,7 @@ public class TimingScreen extends AppCompatActivity {
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
-        SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
         splitNames = new ArrayList<Editable>(Arrays.asList(splitObject.getSplitNamesArray()));
         //splitNames.addAll(Arrays.asList(splitObject.getSplitNamesArray()));
@@ -86,7 +86,7 @@ public class TimingScreen extends AppCompatActivity {
 
         TextView localAvg = findViewById(R.id.localAvg);
         TextView globalAvg = findViewById(R.id.globalAvg);
-        localAvg.setText("Average: " + Float.toString(splitObject.getAvg()));
+        localAvg.setText("Average: " + toTimeFormat((long)splitObject.getAvg()));
         int preset = splitObject.getPresetNum();
         if(preset != -1) {
             globalAvg.setText("Global Average: " + Float.toString(FirebaseLink.getGlobalAvg(preset)));
@@ -153,7 +153,9 @@ public class TimingScreen extends AppCompatActivity {
                     splitButton.setText("Save");
                     pauseButton.setText("Reset");
                     isPaused=true;
-
+                    final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+                    splitObject.runSplit();
+                    splitObject.calcAvg(totalTime);
 
                 }
                 //CHECK FOR LAST SPLIT
