@@ -42,7 +42,7 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
-        getApplicationContext().deleteDatabase("taskDB.db");
+        //getApplicationContext().deleteDatabase("taskDB.db");
         this.handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
         this.handler.populateTaskData();
         //Add all the buttons
