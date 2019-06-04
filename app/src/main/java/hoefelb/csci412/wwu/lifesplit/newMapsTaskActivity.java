@@ -110,6 +110,8 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
     private TextView infoText;
     private String defText;
 
+    private final int IS_MAP_PRESET_TASK = -2;
+
 
     /**
      * Manipulates the map once available.
@@ -404,7 +406,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
                 splitTitles[4] = new SpannableStringBuilder(method);
 
 
-                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles, -1);
+                SplitObject newSplitObject = TaskData.addTask(taskTitle,taskDescription,splitTitles, IS_MAP_PRESET_TASK);
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",TaskData.getIndex(newSplitObject));
                 setResult(Activity.RESULT_OK, returnIntent);

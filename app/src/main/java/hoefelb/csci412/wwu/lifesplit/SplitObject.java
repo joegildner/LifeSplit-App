@@ -15,6 +15,7 @@ public class SplitObject {
     private float[] splitTimes;
     private int presetNum;
     private int ID;
+    private boolean isMapTask = false;
 
     SplitObject(final Editable name, final Editable description, final Editable[] splitNames,final int presetNum) {
         this.name = name;
@@ -87,5 +88,9 @@ public class SplitObject {
     void calcAvg(float newTime) {
         float newAvg = (this.avg*(this.count -1)) + newTime;
         this.avg = newAvg/this.count;
+    }
+
+    void setIsMapTask(boolean isMapTask){
+        this.isMapTask = isMapTask;
     }
 }
