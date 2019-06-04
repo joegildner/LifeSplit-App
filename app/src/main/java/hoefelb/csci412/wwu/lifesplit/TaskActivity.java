@@ -30,6 +30,7 @@ public class TaskActivity extends AppCompatActivity {
     final int EDIT = 2;
     final int CREATE_MAP = 3;
     final boolean DELETE_DATABASE = false;
+    final int DELETE_TASK = 2;
 
     private TaskDBHandler handler;
 
@@ -135,7 +136,7 @@ public class TaskActivity extends AppCompatActivity {
             curButton.setText(newSplitObject.getName());
 
             //deleted task return
-        } else if (requestCode == EDIT && resultCode == Activity.RESULT_CANCELED) {
+        } else if (requestCode == EDIT && resultCode == DELETE_TASK) {
             int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
             int splitObjectID = data.getIntExtra("splitObjectID", -1);
             handler.removeTask(handler.getWritableDatabase(), splitObjectID);

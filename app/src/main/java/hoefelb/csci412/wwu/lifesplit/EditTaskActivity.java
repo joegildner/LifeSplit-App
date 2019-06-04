@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
  */
 
 public class EditTaskActivity extends AppCompatActivity {
+    private final int DELETE_TASK = 2;
     private int numOfSplits = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class EditTaskActivity extends AppCompatActivity {
                 returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
                 returnIntent.putExtra("splitObjectID",TaskData.getTask(splitObjectIndex).getID());
                 TaskData.removeTask(splitObjectIndex);
-                setResult(Activity.RESULT_CANCELED, returnIntent);
+                setResult(DELETE_TASK, returnIntent);
                 EditTaskActivity.this.finish();
             }
         });
