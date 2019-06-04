@@ -14,6 +14,8 @@ Daniel Wilson, Joe Gildner, Bradley Hoefel
 
 [CHECKPOINT_3](https://gitlab.cs.wwu.edu/gildnej/lifesplit/wikis/CHECKPOINT_3)
 
+[FINAL](https://gitlab.cs.wwu.edu/gildnej/lifesplit/wikis/FINAL)
+
 ## Extra Links
 
 [Commit Log](https://gitlab.cs.wwu.edu/gildnej/lifesplit/commits/master)
