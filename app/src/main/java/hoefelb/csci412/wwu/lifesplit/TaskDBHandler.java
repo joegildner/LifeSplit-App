@@ -207,11 +207,12 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         preset = presetTask(title, description, cookSplits,3);
         addTask(preset,db);
 
-        title = "Idk man";
-        description = "Someone come up with another of these";
-        String thingSplits[] = new String[2];
-        thingSplits[0] = "thing1";
-        thingSplits[1] = "thing2";
+        title = "Do Laundry";
+        description = "Common steps for doing laundry";
+        String thingSplits[] = new String[3];
+        thingSplits[0] = "Wash";
+        thingSplits[1] = "Dry";
+        thingSplits[2] = "Fold";
         preset = presetTask(title, description, thingSplits,4);
         addTask(preset,db);
         TaskData.removeAllTasks();
