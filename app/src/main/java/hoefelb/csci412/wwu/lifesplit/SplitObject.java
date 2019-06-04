@@ -80,6 +80,10 @@ public class SplitObject {
         this.count++;
     }
 
+    int getCount(){
+        return this.count;
+    }
+
     void calcAvg(float newTime) {
         float newAvg = (this.avg*(this.count -1)) + newTime;
         this.avg = newAvg/this.count;
