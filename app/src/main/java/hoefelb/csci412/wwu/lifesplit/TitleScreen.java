@@ -19,8 +19,6 @@ public class TitleScreen extends AppCompatActivity {
         titleButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(TitleScreen.this, TaskActivity.class));
-                //findViewById(R.id.text_view).setVisibility(View.INVISIBLE);
-                //findViewById(R.id.title_image).setVisibility(View.INVISIBLE);
             }
         });
     }

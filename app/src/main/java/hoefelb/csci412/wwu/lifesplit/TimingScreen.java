@@ -29,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TimingScreen extends AppCompatActivity {
 
-    public String[] names = {"Cook food", "Eat", "Put Away Dishes"};
     public ArrayList<Editable> splitNames;
 
     private RecyclerView splitItems;
@@ -66,24 +65,23 @@ public class TimingScreen extends AppCompatActivity {
         }
         this.splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
-        splitNames = new ArrayList<Editable>(Arrays.asList(splitObject.getSplitNamesArray()));
-        //splitNames.addAll(Arrays.asList(splitObject.getSplitNamesArray()));
+        splitNames = new ArrayList<>(Arrays.asList(splitObject.getSplitNamesArray()));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timing_screen);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.taskName);
+        Toolbar toolbar = findViewById(R.id.taskName);
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
-        splitItems = (RecyclerView) findViewById(R.id.split_views);
+        splitItems = findViewById(R.id.split_views);
         final SplitAdapter sAdapter = new SplitAdapter(splitNames);
         splitItems.setAdapter(sAdapter);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         splitItems.setLayoutManager(linearLayoutManager);
 
-        timer = (TextView)findViewById(R.id.timerText);
-        pauseButton = (Button) findViewById(R.id.pause_button);
-        splitButton = (Button) findViewById(R.id.split_button);
-        description = (TextView) findViewById(R.id.taskDescription);
+        timer = findViewById(R.id.timerText);
+        pauseButton = findViewById(R.id.pause_button);
+        splitButton = findViewById(R.id.split_button);
+        description = findViewById(R.id.taskDescription);
 
         TextView localAvg = findViewById(R.id.localAvg);
         TextView globalAvg = findViewById(R.id.globalAvg);
@@ -122,15 +120,15 @@ public class TimingScreen extends AppCompatActivity {
                 //Start the stopwatch for the first time
                 isPaused = false;
                 isStarted = true;
-                splitButton.setText("Split");
+                splitButton.setText(R.string.splitButton);
                 startTime = SystemClock.uptimeMillis();
                 handler.postDelayed(runnable, 0);
             }
             else if(isPaused){
                 //Resume from last point.
                 isPaused = false;
-                splitButton.setText("Split");
-                pauseButton.setText("Pause");
+                splitButton.setText(R.string.splitButton);
+                pauseButton.setText(R.string.pauseButton);
                 startTime = SystemClock.uptimeMillis()-timeBuff;
                 timeBuff=0;
                 handler.postDelayed(runnable, 0);
@@ -152,16 +150,14 @@ public class TimingScreen extends AppCompatActivity {
                     System.out.println(totalTime);
                     timer.setText(toTimeFormat(totalTime));
                     splitButton.setBackgroundColor(Color.CYAN);
-                    splitButton.setText("Save");
-                    pauseButton.setText("Reset");
+                    splitButton.setText(R.string.saveButton);
+                    pauseButton.setText(R.string.resetButton);
                     isPaused=true;
                     splitObject.runSplit();
                     splitObject.calcAvg(totalTime);
                     FirebaseLink.dbUpdate(splitObject.getPresetNum(), totalTime);
 
                 }
-                //CHECK FOR LAST SPLIT
-
             }
         }
     };
@@ -171,17 +167,17 @@ public class TimingScreen extends AppCompatActivity {
 
             if(isStarted&&!isPaused){
                 //Pause the timer
-                splitButton.setText("Resume");
-                pauseButton.setText("Reset");
+                splitButton.setText(R.string.resumeButton);
+                pauseButton.setText(R.string.resetButton);
                 timeBuff += milSecs;
                 handler.removeCallbacks(runnable);
                 isPaused = true;
             }
             else if(isPaused){
                 //Reset all the timers and buttons
-                splitButton.setText("Start");
+                splitButton.setText(R.string.Startbutton);
                 splitButton.setBackgroundColor(Color.parseColor("#45c15c"));
-                pauseButton.setText("Pause");
+                pauseButton.setText(R.string.pauseButton);
                 isPaused= true;
                 isStarted = false;
                 isCompleted = false;
@@ -240,8 +236,8 @@ public class TimingScreen extends AppCompatActivity {
             ViewHolder(View itemView){
                 super(itemView);
 
-                splitNameView = (TextView) itemView.findViewById(R.id.split_name);
-                splitTiming = (TextView) itemView.findViewById(R.id.split_timing);
+                splitNameView = itemView.findViewById(R.id.split_name);
+                splitTiming = itemView.findViewById(R.id.split_timing);
 
 
             }

@@ -1,21 +1,21 @@
 package hoefelb.csci412.wwu.lifesplit;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-/**
- * Created by wilso279 on 5/29/19.
- */
 
-public class FirebaseLink {
+//handles all firebase connections and related comments
+class FirebaseLink {
     private static float[] taskAvg = new float[5];
     private static int[] taskCount = new int[5];
 
     //updates db at the end of a split
-    public static void dbUpdate(final int index, final float time) {
+    static void dbUpdate(final int index, final float time) {
         if(index == -1) {
             return;
         }
@@ -52,7 +52,7 @@ public class FirebaseLink {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 // Failed to read value
             }
         });

@@ -3,7 +3,6 @@ package hoefelb.csci412.wwu.lifesplit;
 import android.text.Editable;
 
 /**
- * Created by wilso279 on 5/13/19.
  * Object to store task data
  */
 
@@ -47,14 +46,8 @@ public class SplitObject {
 
     Editable[] getSplitNamesArray(){return this.splitNames;}
 
-    public float[] getSplitTimesArray(){return this.splitTimes;}
-
     Editable getSplitName(final int index) {
         return this.splitNames[index];
-    }
-
-    public int getCount() {
-        return this.count;
     }
 
     int getNumSplits(){return this.splitNames.length;}
@@ -65,10 +58,6 @@ public class SplitObject {
 
     int getPresetNum() {
         return this.presetNum;
-    }
-
-    public float getSplitTime(final int index) {
-        return this.splitTimes[index];
     }
 
     void setAverageTime(final Float avg){
@@ -87,11 +76,11 @@ public class SplitObject {
 
     void setID(final int ID){this.ID = ID;}
 
-    public void runSplit() {
+    void runSplit() {
         this.count++;
     }
 
-    public void calcAvg(float newTime) {
+    void calcAvg(float newTime) {
         float newAvg = (this.avg*(this.count -1)) + newTime;
         this.avg = newAvg/this.count;
     }

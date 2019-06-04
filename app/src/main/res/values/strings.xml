@@ -97,4 +97,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps_task">Map</string>
     <string name="map_activity_hash">74e83ece227babd7efdba7e3f0d89f86</string>
+    <string name="saveButton">Save</string>
+    <string name="resetButton">Reset</string>
+    <string name="Startbutton">Start</string>
+    <string name="pauseButton">Pause</string>
+    <string name="resumeButton">Resume</string>
+    <string name="splitButton">Split</string>
 </resources>
