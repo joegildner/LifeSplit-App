@@ -12,10 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-/**
- * Created by wilso279 on 5/27/19.
- */
-
+//called onlongpush to edit existing task
 public class EditTaskActivity extends AppCompatActivity {
     private final int DELETE_TASK = 2;
     private int numOfSplits = 1;
@@ -29,7 +26,7 @@ public class EditTaskActivity extends AppCompatActivity {
         final Button resetScreenButton = findViewById(R.id.newTaskResetButton);
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
         final Button deleteButton = findViewById(R.id.newTaskDeleteButton);
-        final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
+        final LinearLayout splitLayout = findViewById(R.id.splitLayout);
 
         //get data from intent
         Intent context = getIntent();

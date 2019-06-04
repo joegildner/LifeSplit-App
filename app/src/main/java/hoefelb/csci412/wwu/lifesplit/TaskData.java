@@ -4,10 +4,7 @@ import android.text.Editable;
 
 import java.util.ArrayList;
 
-/**
- * Created by wilso279 on 5/13/19.
- */
-
+//class stores all splitObjects
 class TaskData {
 
     private static ArrayList<SplitObject> taskData = new ArrayList<>();

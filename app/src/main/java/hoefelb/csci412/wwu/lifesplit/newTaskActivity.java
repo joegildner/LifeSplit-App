@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 
-
+//generates new task after new task button pressed
 public class newTaskActivity extends AppCompatActivity {
     private int numOfSplits = 1;
     @Override
@@ -25,7 +25,7 @@ public class newTaskActivity extends AppCompatActivity {
         final Button addSplitButton = findViewById(R.id.newTaskAddSplitButton);
         final Button resetScreenButton = findViewById(R.id.newTaskResetButton);
         final Button saveButton = findViewById(R.id.newTaskSaveButton);
-        final LinearLayout splitLayout = (LinearLayout)findViewById(R.id.splitLayout);
+        final LinearLayout splitLayout = findViewById(R.id.splitLayout);
         TaskData.init();
 
         EditText newText = new EditText(getApplicationContext());

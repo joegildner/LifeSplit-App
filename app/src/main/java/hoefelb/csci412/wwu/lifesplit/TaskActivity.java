@@ -2,28 +2,20 @@ package hoefelb.csci412.wwu.lifesplit;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.tasks.Task;
 
-
+//main menu task for app
 public class TaskActivity extends AppCompatActivity {
 
     private int numButtons = 0;
-    SQLiteDatabase db;
 
     final int CREATE = 0;
     final int TIMING = 1;
@@ -39,7 +31,7 @@ public class TaskActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //initialize floating action button
@@ -76,11 +68,9 @@ public class TaskActivity extends AppCompatActivity {
         });
 
         final FloatingActionButton mapButton = findViewById(R.id.mapButton);
-        //mapButton.setBackgroundColor(Color.TRANSPARENT);
         mapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent newTaskIntent = new Intent(TaskActivity.this, newMapsTaskActivity.class);
-                //newTaskIntent.putExtra("index", numButtons);
                 startActivityForResult(newTaskIntent, CREATE_MAP);
             }
         });
@@ -119,14 +109,6 @@ public class TaskActivity extends AppCompatActivity {
             handler.addTask(newSplitObject, handler.getWritableDatabase());
             generateMapButton(newSplitObject);
 
-
-            //timing screen return
-        } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
-            Long taskTime = data.getLongExtra("totalTimeLong", -1);
-            int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
-            //store the result data from the timing screen
-            //make a call to the split object for the index to recalculate the average time
-
             //edited task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_OK) {
             int extras = data.getIntExtra("splitObjectIndex", -1);
@@ -144,20 +126,6 @@ public class TaskActivity extends AppCompatActivity {
             linearLayout.removeView(linearLayout.getChildAt(splitObjectIndex));
             numButtons--;
         }
-
-    }
-
-    //generates a preset task based on the provided name and description
-    SplitObject presetTask(final String title, final String description, final String splitStrings[], final int taskNum) {
-        Editable.Factory factory = Editable.Factory.getInstance();
-        Editable taskTitle = factory.newEditable(title);
-        Editable taskDescription = factory.newEditable(description);
-        int numSplits = splitStrings.length;
-        Editable[] splitTitles = new Editable[numSplits];
-        for (int i = 0; i < numSplits; i++) {
-            splitTitles[i] = factory.newEditable(splitStrings[i]);
-        }
-        return TaskData.addTask(taskTitle, taskDescription, splitTitles, taskNum);
     }
 
     //generates a button in the view for the provided SplitObject
@@ -198,7 +166,6 @@ public class TaskActivity extends AppCompatActivity {
 
         newButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                //FirebaseLink.dbPullAll();
                 Intent taskIntent = new Intent(TaskActivity.this, mapsTimingScreen.class);
                 LinearLayout parent = (LinearLayout) view.getParent();
                 System.out.println(parent.indexOfChild(view));
@@ -216,6 +183,5 @@ public class TaskActivity extends AppCompatActivity {
         });
         numButtons++;
     }
-
 }
 
