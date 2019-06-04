@@ -122,10 +122,15 @@ public class TaskActivity extends AppCompatActivity {
 
             //timing screen return
         } else if (requestCode == TIMING && resultCode == Activity.RESULT_OK) {
-            Long taskTime = data.getLongExtra("totalTimeLong", -1);
-            int splitObjectIndex = data.getIntExtra("splitObjectIndex", -1);
+            int splitObjectID = data.getIntExtra("splitObjectID",-1);
+            Long averageTaskTime = data.getLongExtra("totalTimeLong", -1);
+            int totalTimesRun = data.getIntExtra("totalTimesRun", -1);
+            if(splitObjectID != -1)
+                handler.updadateAverageTime(handler.getWritableDatabase(),splitObjectID,averageTaskTime,totalTimesRun);
             //store the result data from the timing screen
             //make a call to the split object for the index to recalculate the average time
+
+            //Update SQLite database
 
             //edited task return
         } else if (requestCode == EDIT && resultCode == Activity.RESULT_OK) {

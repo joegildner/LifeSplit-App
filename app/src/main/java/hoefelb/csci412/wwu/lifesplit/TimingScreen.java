@@ -34,6 +34,7 @@ public class TimingScreen extends AppCompatActivity {
 
     private RecyclerView splitItems;
     private int splitObjectIndex;
+    private  SplitObject  splitObject;
 
     private boolean isPaused = true;
     private boolean isStarted = false;
@@ -63,7 +64,7 @@ public class TimingScreen extends AppCompatActivity {
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
-        final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+        this.splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
         splitNames = new ArrayList<Editable>(Arrays.asList(splitObject.getSplitNamesArray()));
         //splitNames.addAll(Arrays.asList(splitObject.getSplitNamesArray()));
@@ -111,8 +112,9 @@ public class TimingScreen extends AppCompatActivity {
                 //Save all the split data, get ready for handing back to parent activity
                 //Perhaps keep the bottom timing view as total time, then pull value from that?
                 Intent returnIntent = getIntent();
-                returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
+                returnIntent.putExtra("splitObjectID",splitObject.getID());
                 returnIntent.putExtra("totalTimeLong",totalTime);
+                returnIntent.putExtra("totalTimesRun",splitObject.getCount());
                 setResult(Activity.RESULT_OK, returnIntent);
                 TimingScreen.this.finish();
             }
@@ -153,7 +155,6 @@ public class TimingScreen extends AppCompatActivity {
                     splitButton.setText("Save");
                     pauseButton.setText("Reset");
                     isPaused=true;
-                    final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
                     splitObject.runSplit();
                     splitObject.calcAvg(totalTime);
                     FirebaseLink.dbUpdate(splitObject.getPresetNum(), totalTime);

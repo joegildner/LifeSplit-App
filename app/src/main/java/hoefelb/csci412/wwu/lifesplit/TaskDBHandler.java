@@ -230,4 +230,11 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         }
         return TaskData.addTask(taskTitle, taskDescription, splitTitles,presetID);
     }
+
+    public void updadateAverageTime(SQLiteDatabase db,int id,float newAverage,int numTimes){
+        String SQLQuery = "Update " + TABLE_TASKS + " set "+COLUMN_TASK_AVERAGE_TIME + " = " +
+                newAverage + ", " + COLUMN_TASK_TIMES_RUN + " = " + numTimes + " where "+
+                COLUMN_TASK_ID + " = " + id;
+        db.execSQL(SQLQuery);
+    }
 }
