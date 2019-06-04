@@ -29,6 +29,7 @@ public class TaskActivity extends AppCompatActivity {
     final int TIMING = 1;
     final int EDIT = 2;
     final int CREATE_MAP = 3;
+    final boolean DELETE_DATABASE = false;
 
     private TaskDBHandler handler;
 
@@ -43,7 +44,9 @@ public class TaskActivity extends AppCompatActivity {
         //initialize floating action button
         final FloatingActionButton addButton = findViewById(R.id.addButton);
         addButton.setBackgroundColor(Color.TRANSPARENT);
-        //getApplicationContext().deleteDatabase("taskDB.db");
+        if(DELETE_DATABASE) {
+            getApplicationContext().deleteDatabase("taskDB.db");
+        }
         this.handler = new TaskDBHandler(getApplicationContext(), null, null, 1);
         this.handler.populateTaskData();
         //Add all the buttons
@@ -204,6 +207,9 @@ public class TaskActivity extends AppCompatActivity {
         });
         newButton.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View view) {
+                Intent taskIntent = new Intent(TaskActivity.this, EditTaskActivity.class);
+                taskIntent.putExtra("splitObjectIndex", ((LinearLayout) view.getParent()).indexOfChild(view));
+                startActivityForResult(taskIntent, EDIT);
                 return true;
             }
         });
