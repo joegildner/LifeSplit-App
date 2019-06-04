@@ -110,11 +110,10 @@ public class TaskDBHandler extends SQLiteOpenHelper {
         //first, check if it is a preset task
         String taskSQLQuery = "Delete from " + TABLE_TASKS + " where " + COLUMN_TASK_ID + " = " + i +
         " and " +COLUMN_PRESET_TASK_NUM + " = -1";
-        String where = COLUMN_TASK_ID + " = " + i +" and "+COLUMN_PRESET_TASK_NUM + " = -1";
+        String where = COLUMN_TASK_ID + " = " + i +" and "+COLUMN_PRESET_TASK_NUM + " < 0";
         int rowsDeleted = db.delete(TABLE_TASKS,where,null);
         if(rowsDeleted == 1){
-        taskSQLQuery = "Delete from " + TABLE_SPLITS + " where " + COLUMN_TASK_ID + " = " + i +
-                " and " +COLUMN_PRESET_TASK_NUM + " = -1";
+        taskSQLQuery = "Delete from " + TABLE_SPLITS + " where " + COLUMN_TASK_ID + " = " + i;
         db.execSQL(taskSQLQuery);
         }
     }

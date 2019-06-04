@@ -27,7 +27,7 @@ public class SplitObject {
         }
         this.count = 0;
         this.avg = 0;
-        this.presetNum = presetNum;
+        this.presetNum = -1;
         this.ID = -1;
     }
 

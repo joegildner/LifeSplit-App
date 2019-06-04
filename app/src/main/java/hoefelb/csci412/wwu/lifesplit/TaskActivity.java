@@ -106,6 +106,7 @@ public class TaskActivity extends AppCompatActivity {
                 System.out.println(TaskData.getTask(index).getName());
             }
             final SplitObject newSplitObject = TaskData.getTask(index);
+            newSplitObject.setIsMapTask(true);
             handler.addTask(newSplitObject, handler.getWritableDatabase());
             generateMapButton(newSplitObject);
 

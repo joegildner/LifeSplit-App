@@ -108,7 +108,8 @@ public class EditTaskActivity extends AppCompatActivity {
                 //save data, return to previous screen
                 Intent returnIntent = getIntent();
                 returnIntent.putExtra("splitObjectIndex",splitObjectIndex);
-                returnIntent.putExtra("splitObjectID",TaskData.getTask(splitObjectIndex).getID());
+                int ID = TaskData.getTask(splitObjectIndex).getID();
+                returnIntent.putExtra("splitObjectID",ID);
                 TaskData.removeTask(splitObjectIndex);
                 setResult(DELETE_TASK, returnIntent);
                 EditTaskActivity.this.finish();
