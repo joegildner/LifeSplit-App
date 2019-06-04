@@ -44,7 +44,7 @@ class FirebaseLink {
         DatabaseReference ref = db.getReference(("task"+ index + "/avg"));
         ref.addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 Float value = dataSnapshot.getValue(Float.class);
@@ -60,7 +60,7 @@ class FirebaseLink {
         ref = db.getReference(("task"+ index + "/count"));
         ref.addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 int value = dataSnapshot.getValue(Integer.class);
@@ -68,7 +68,7 @@ class FirebaseLink {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 // Failed to read value
             }
         });
