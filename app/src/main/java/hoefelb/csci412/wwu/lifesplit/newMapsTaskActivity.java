@@ -150,17 +150,14 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
         startingLocation = new LatLng(39, -97);
 
+        // Add a marker in Sydney and move the camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(startingLocation));
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if(locationEnabled) {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, locationSuccess);
         }
-        else{
-            System.out.println("LOCATION IS DISABLED");
-        }
-
-        // Add a marker in Sydney and move the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(startingLocation));
     }
 
     @Override
@@ -257,7 +254,7 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
     private GoogleMap.OnMapClickListener setAMarker = new GoogleMap.OnMapClickListener() {
         @Override
         public void onMapClick(LatLng point) {
-            MarkerOptions markerOptions = new MarkerOptions().position(point);
+            MarkerOptions markerOptions = new MarkerOptions().position(point).title("Start");
             aMarker = mMap.addMarker(markerOptions);
             aLatLng = point;
 
@@ -306,10 +303,9 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
     private GoogleMap.OnMapClickListener setBMarker = new GoogleMap.OnMapClickListener() {
         @Override
         public void onMapClick(LatLng point) {
-            MarkerOptions markerOptions = new MarkerOptions().position(point).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            MarkerOptions markerOptions = new MarkerOptions().position(point).title("End").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             bMarker = mMap.addMarker(markerOptions);
             bLatLng = point;
-
 
             bButton.setText("Reset B");
             bButton.setOnClickListener(resetB);
@@ -382,7 +378,6 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
 
                 Address address = addressList.get(0);
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, stdZoom));
 
             }
@@ -395,6 +390,9 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         public void onClick(View v) {
             if(aLatLng != null && bLatLng !=null) {
                 Editable taskTitle = titleText.getText();
+                if(taskTitle.toString().length() <1){
+                    taskTitle = new SpannableStringBuilder("Untitled Task");
+                }
                 Editable taskDescription = new SpannableStringBuilder(getResources().getString(R.string.map_activity_hash));
 
                 Editable[] splitTitles = new Editable[5];
@@ -432,10 +430,15 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     locationEnabled = true;
+                        fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(this, locationSuccess);
                 }
 
                 else {
-                    locationEnabled = false;
+                    Toast toast=Toast.makeText(getBaseContext(),"Location must be enabled for maps activities.",Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL, 0,0);
+                    toast.show();
+                    finish();
                 }
 
                 return;
@@ -443,6 +446,8 @@ public class newMapsTaskActivity extends FragmentActivity implements OnMapReadyC
         }
     }
 
+
+    // ----- BELOW CODE FOR DIRECTIONS API, SOURCE: https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
     private class DownloadTask extends AsyncTask {
 
         @Override

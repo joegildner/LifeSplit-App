@@ -95,7 +95,6 @@ public class TaskActivity extends AppCompatActivity {
             handler.addTask(newSplitObject, handler.getWritableDatabase());
             generateButton(newSplitObject);
 
-
             //timing screen return
         } else if (requestCode == CREATE_MAP && resultCode == Activity.RESULT_OK) {
 

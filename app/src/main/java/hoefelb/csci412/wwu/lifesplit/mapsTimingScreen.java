@@ -5,6 +5,7 @@ package hoefelb.csci412.wwu.lifesplit;
 //Current location
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,12 +18,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,8 +34,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -57,6 +64,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCallback {
     private int numOfSplits = 1;
@@ -66,11 +74,10 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
 
     private GoogleMap mMap;
     private int splitObjectIndex;
+    private SplitObject splitObject;
 
     private float stdZoom = 15.0f;
-
-    protected LocationManager locationManager;
-    protected LocationListener locationListener;
+    private float DISTANCE_THRESHOLD = 10.0f; //IN METERS
 
     protected LocationRequest request;
     private FusedLocationProviderClient fusedLocationClient;
@@ -78,28 +85,37 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
     protected Location mylocation;
     protected Context context;
 
-    protected String latitude, longitude;
-    protected boolean gps_enabled, network_enabled;
-
     private LatLng startingLocation;
 
     private Button startButton;
     private Button pauseButton;
-    private TextView currTime;
-    private TextView avgTime;
 
     private boolean aSet = false;
     private boolean bSet = false;
 
     private Marker aMarker;
+    private MarkerOptions aMarkerOptions;
     private LatLng aLatLng;
     private Marker bMarker;
     private LatLng bLatLng;
     private Polyline directions;
     private String method;
 
-    private TextView infoText;
-    private String defText;
+    private MarkerOptions currMarkerOptions;
+    private Marker currLocationMarker;
+
+
+    private TextView timer;
+
+    private long totalTime=0;
+    long milSecs;
+    long startTime;
+    long timeBuff;
+    long upTime = 0L;
+    Handler handler;
+    long hours;
+    long secs;
+    long mins;
 
 
     /**
@@ -111,6 +127,11 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+    private void startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(request, locationCallback,null);
+    }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -132,10 +153,12 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         request = new LocationRequest();
         request.setInterval(1000);
         request.setFastestInterval(100);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         startingLocation = new LatLng(39, -97);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         if(locationEnabled) {
             fusedLocationClient.getLastLocation()
                     .addOnSuccessListener(this, locationSuccess);
@@ -144,15 +167,16 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
             System.out.println("LOCATION IS DISABLED");
         }
 
-        // Add a marker in Sydney and move the camera
-
-        MarkerOptions markerOptions = new MarkerOptions().position(aLatLng);
-        aMarker = mMap.addMarker(markerOptions);
-        MarkerOptions bOptions = new MarkerOptions().position(bLatLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        aMarkerOptions = new MarkerOptions().position(aLatLng).title("Start");
+        aMarker = mMap.addMarker(aMarkerOptions);
+        MarkerOptions bOptions = new MarkerOptions().position(bLatLng).title("End").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
         bMarker = mMap.addMarker(bOptions);
 
-        LatLngBounds mapBounds = new LatLngBounds(aLatLng, bLatLng);
-        mMap.setLatLngBoundsForCameraTarget(mapBounds);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(aLatLng).include(bLatLng);
+
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(builder.build(), 100);
+        mMap.moveCamera(cameraUpdate);
 
         if(aLatLng != null && bLatLng != null){
             String url = getDirectionsUrl(aLatLng, bLatLng);
@@ -161,6 +185,11 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
 
             downloadTask.execute(url);
         }
+
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_maps_indicator_current_position);
+        currMarkerOptions = new MarkerOptions().icon(icon).anchor(0.5f,0.5f);
+
+        startLocationUpdates();
     }
 
     @Override
@@ -171,7 +200,8 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         if (splitObjectIndex == -1){
             System.out.println("ERROR - ID not found");
         }
-        final SplitObject  splitObject = TaskData.getTask(splitObjectIndex);
+
+        splitObject = TaskData.getTask(splitObjectIndex);
         Editable title = splitObject.getName();
         Editable[] splitNames = splitObject.getSplitNamesArray();
 
@@ -183,7 +213,6 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
 
         aLatLng = new LatLng(Double.parseDouble(splitNames[0].toString()),Double.parseDouble(splitNames[1].toString()));
-
         bLatLng = new LatLng(Double.parseDouble(splitNames[2].toString()),Double.parseDouble(splitNames[3].toString()));
 
         method = splitNames[4].toString();
@@ -191,20 +220,57 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         Toolbar toolbar = (Toolbar) findViewById(R.id.mapTitle);
         toolbar.setTitle(splitObject.getName());
 
-        Button startButton = (Button) findViewById(R.id.mapSplit);
-        Button pauseButton = (Button) findViewById(R.id.mapPause);
-        TextView currTime = (TextView) findViewById(R.id.currTime);
+        startButton = (Button) findViewById(R.id.mapSplit);
+        pauseButton = (Button) findViewById(R.id.mapPause);
+        timer = (TextView) findViewById(R.id.currTime);
         TextView avgTime = (TextView) findViewById(R.id.avgTime);
+        avgTime.setText(toTimeFormat((long)(splitObject.getAvg())));
+        System.out.println(splitObject.getAvg());
+        System.out.println(splitObject.getCount());
 
         startButton.setOnClickListener(startTimer);
+        pauseButton.setOnClickListener(null);
 
+        handler = new Handler();
 
     }
 
     private View.OnClickListener startTimer = new View.OnClickListener() {
         public void onClick(View v) {
+            float[] distance = new float[2];
+            Location.distanceBetween(mylocation.getLatitude(), mylocation.getLongitude(), aLatLng.latitude, aLatLng.longitude,distance);
+
+            if(distance[0] > (DISTANCE_THRESHOLD + mylocation.getAccuracy())){
+                String toastText = String.format("Too far from the start point, no cheating! %.1fm away", distance[0]);
+                Toast toast=Toast.makeText(getBaseContext(),toastText,Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0,300);
+                toast.show();
+            }else {
+                startButton.setTextColor(Color.LTGRAY);
+                startButton.setOnClickListener(null);
+                startButton.setText("In Progress...");
+                pauseButton.setText("Pause");
+                pauseButton.setOnClickListener(pauseTimer);
+                aMarker.remove();
+
+                startTime = SystemClock.uptimeMillis();
+                timeBuff = 0;
+                handler.postDelayed(runnable, 0);
+            }
+        }
+    };
+
+    private View.OnClickListener resumeTimer = new View.OnClickListener() {
+        public void onClick(View v) {
             startButton.setTextColor(Color.LTGRAY);
             startButton.setOnClickListener(null);
+            startButton.setText("In Progress...");
+            pauseButton.setText("Pause");
+            pauseButton.setOnClickListener(pauseTimer);
+
+            startTime = SystemClock.uptimeMillis()-timeBuff;
+            timeBuff=0;
+            handler.postDelayed(runnable, 0);
         }
     };
 
@@ -214,15 +280,64 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
             startButton.setText("Resume");
             startButton.setTextColor(Color.BLACK);
             pauseButton.setOnClickListener(resetTimer);
-            startButton.setOnClickListener(startTimer);
+            startButton.setOnClickListener(resumeTimer);
+
+            timeBuff += milSecs;
+
+            handler.removeCallbacks(runnable);
         }
     };
 
     private View.OnClickListener resetTimer = new View.OnClickListener() {
         public void onClick(View v) {
+            startButton.setBackgroundColor(Color.parseColor("#45c15c"));
+            startButton.setText("Start");
+            pauseButton.setText("Pause");
+            startButton.setTextColor(Color.BLACK);
+            pauseButton.setOnClickListener(null);
+            startButton.setOnClickListener(startTimer);
+            aMarker = mMap.addMarker(aMarkerOptions);
+
+            timeBuff = 0;
+            totalTime = 0;
+            timer.setText("00:00:00");
+
 
         }
     };
+
+    public void endTimer() {
+        startButton.setText("Save");
+        startButton.setBackgroundColor(Color.parseColor("#00BFFF"));
+        pauseButton.setText("Reset");
+        startButton.setTextColor(Color.BLACK);
+        pauseButton.setOnClickListener(resetTimer);
+
+        handler.removeCallbacks(runnable);
+
+        startButton.setOnClickListener(save);
+
+    }
+
+    private View.OnClickListener save = new View.OnClickListener() {
+        public void onClick(View v) {
+            milSecs = SystemClock.uptimeMillis() - startTime;
+            totalTime = milSecs;
+
+            splitObject.runSplit();
+            splitObject.calcAvg(totalTime);
+
+            Intent returnIntent = getIntent();
+            returnIntent.putExtra("splitObjectID",splitObject.getID());
+            returnIntent.putExtra("totalTimeLong",totalTime);
+            returnIntent.putExtra("totalTimesRun",splitObject.getCount());
+            setResult(Activity.RESULT_OK, returnIntent);
+            mapsTimingScreen.this.finish();
+
+
+        }
+    };
+
 
 
     private OnSuccessListener<Location> locationSuccess = new OnSuccessListener<Location>() {
@@ -232,43 +347,41 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
             if (location != null) {
                 mylocation = location;
                 startingLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                LatLng myLocation = startingLocation;
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingLocation,stdZoom));
-                BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_maps_indicator_current_position);
 
-                MarkerOptions markerOptions = new MarkerOptions().position(startingLocation)
-                        .icon(icon).anchor(0.5f,0.5f);;
+                currMarkerOptions.position(startingLocation);
 
-                mMap.addMarker(markerOptions);
+                currLocationMarker = mMap.addMarker(currMarkerOptions);
+                mMap.setOnMarkerClickListener(null);
+
             } else {
                 System.out.println("LOCATION IS NULL, BIG OOF");
             }
         }
     };
 
-    private View.OnClickListener mapSearch = new View.OnClickListener() {
-        public void onClick(View v) {
-            EditText searchText = (EditText) findViewById(R.id.mapSearchText);
-            String location = searchText.getText().toString();
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            if (locationResult == null) {
+                System.out.println("YOU'VE FAILED");
+                return;
+            }
+                mylocation = locationResult.getLastLocation();
+                LatLng myLocationLatLng = new LatLng(mylocation.getLatitude(),mylocation.getLongitude());
+                currMarkerOptions.position(myLocationLatLng);
+                currLocationMarker.remove();
+                currLocationMarker = mMap.addMarker(currMarkerOptions);
 
-            List<Address> addressList = null;
+                float[] distance = new float[2];
+                Location.distanceBetween(mylocation.getLatitude(), mylocation.getLongitude(), bLatLng.latitude, bLatLng.longitude,distance);
 
-            if (location != null && !location.equals("")) {
-                Geocoder geocoder = new Geocoder(getApplicationContext());
-                try {
-                    addressList = geocoder.getFromLocationName(location, 1);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if(distance[0] < DISTANCE_THRESHOLD + mylocation.getAccuracy()){
+                    endTimer();
                 }
 
-                Address address = addressList.get(0);
-                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, stdZoom));
-
-            }
-
-        }
+        };
     };
 
 
@@ -291,6 +404,19 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    //Overloaded method for when miliseconds is known, to format as --:--:--
+    String toTimeFormat(long time){
+        upTime = timeBuff + milSecs;
+        hours = TimeUnit.MILLISECONDS.toHours(time);
+        mins = TimeUnit.MILLISECONDS.toMinutes(time)-hours*60;
+        secs = TimeUnit.MILLISECONDS.toSeconds(time)-3600*hours-60*mins;
+
+        String timerText = String.format("%02d:%02d:%02d", hours, mins,secs);
+
+        return timerText;
+    }
+
+    // ----- BELOW CODE FOR DIRECTIONS API, SOURCE: https://www.journaldev.com/13373/android-google-map-drawing-route-two-points
     private class DownloadTask extends AsyncTask {
 
         @Override
@@ -337,7 +463,6 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
                 e.printStackTrace();
             }
 
-            System.out.println(routes.toString());
             return routes;
         }
 
@@ -438,5 +563,22 @@ public class mapsTimingScreen extends FragmentActivity implements OnMapReadyCall
         return data;
     }
 
+    public Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            milSecs = SystemClock.uptimeMillis() - startTime;
+            upTime = timeBuff + milSecs;
+
+            hours = TimeUnit.MILLISECONDS.toHours(upTime);
+            mins = TimeUnit.MILLISECONDS.toMinutes(upTime)-hours*60;
+            secs = TimeUnit.MILLISECONDS.toSeconds(upTime)-3600*hours-60*mins;
+
+            String timerText = String.format("%02d:%02d:%02d", hours, mins,secs);
+
+            timer.setText(timerText);
+
+            handler.postDelayed(this, 0);
+        }
+    };
 
 }
